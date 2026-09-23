@@ -1,17 +1,17 @@
-Welcome to your new TanStack Start app!
-
-# AI-movie-explorer
+# AI Movie Explorer App
 
 Think of it as a mini IMDb/Letterboxd + AI assistant app.
-Stack:
-React
-TypeScript
-Biome
-Vercel
-TanStack Router
-TanStack Query
-Vite / TanStack Start
-TMDB API
+
+# Stack:
+
+- React
+- TypeScript
+- Biome
+- Vercel
+- TanStack Router
+- TanStack Query
+- Vite / TanStack Start
+- TMDB API
 
 # Getting Started
 
