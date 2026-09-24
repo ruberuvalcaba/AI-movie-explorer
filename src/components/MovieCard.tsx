@@ -13,13 +13,15 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
 				<img
 					src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
 					alt={movie.title}
+					width={200}
 				/>
 			)}
 
 			<h2>{movie.title}</h2>
-
-			<p>{movie.release_date?.slice(0, 4)}</p>
-			<p>⭐ {movie.vote_average.toFixed(1)}</p>
+			<div className="genres">
+				<p>{movie.release_date?.slice(0, 4)}</p>
+				<p>⭐ {movie.vote_average.toFixed(1)}</p>
+			</div>
 		</article>
 	);
 };

@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { MovieCarousel } from "@/components/MovieCarousel";
-import { popularMoviesQuery } from "./queries";
+import { upcomingMoviesQuery } from "./queries";
 
-export const PopularMovies = () => {
-	const { data, isPending, error } = useQuery(popularMoviesQuery(1));
+export const UpcomingMovies = () => {
+	const { data, isPending, error } = useQuery(upcomingMoviesQuery(1));
 
 	if (isPending) {
 		return <p>Loading movies...</p>;
@@ -15,7 +15,7 @@ export const PopularMovies = () => {
 
 	return (
 		<section>
-			<h1>Popular Movies</h1>
+			<h1>Upcoming Movies</h1>
 			<MovieCarousel movies={data.results} />
 		</section>
 	);
