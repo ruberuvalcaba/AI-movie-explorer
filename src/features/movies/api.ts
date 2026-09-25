@@ -11,7 +11,6 @@ export const movieApi = async <T>(
 	params?: Record<string, string>,
 ): Promise<T> => {
 	const searchParams = new URLSearchParams(params);
-
 	const url = `${TMDB_BASE_URL}${endpoint}?${searchParams}`;
 
 	const response = await fetch(url, {
@@ -20,7 +19,6 @@ export const movieApi = async <T>(
 			accept: "application/json",
 		},
 	});
-
 	if (!response.ok) {
 		throw new Error(`TMDB request failed: ${response.status}`);
 	}

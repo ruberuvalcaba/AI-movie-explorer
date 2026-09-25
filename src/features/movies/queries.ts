@@ -5,8 +5,8 @@ import {
 	getTrendingMovies,
 	getUpcomingMovies,
 } from "./services";
-
-export const popularMoviesQuery = (page = 1) =>
+//Currently unsused quries, but used for: const { data, isPending, error } = useQuery(topRatedMoviesQuery(1));
+export const popularMoviesQuery = (page: number) =>
 	queryOptions({
 		queryKey: ["movies", "popular", page],
 		queryFn: () => getPopularMovies(page),
