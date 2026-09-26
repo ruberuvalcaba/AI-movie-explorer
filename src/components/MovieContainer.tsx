@@ -18,6 +18,7 @@ export const MovieContainer = ({
 }: MovieContainerProps) => {
 	const loadMoreRef = useRef<HTMLDivElement>(null);
 
+	/* Infinit right scrolling */
 	useEffect(() => {
 		const element = loadMoreRef.current;
 

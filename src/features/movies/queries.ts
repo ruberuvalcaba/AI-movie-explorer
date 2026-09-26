@@ -1,11 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
+	getMovieDetails,
 	getPopularMovies,
 	getTopRatedMovies,
 	getTrendingMovies,
 	getUpcomingMovies,
 } from "./services";
 //Currently unsused quries, but used for: const { data, isPending, error } = useQuery(topRatedMoviesQuery(1));
+//Query options factory
 export const popularMoviesQuery = (page: number) =>
 	queryOptions({
 		queryKey: ["movies", "popular", page],
@@ -28,6 +30,13 @@ export const upcomingMoviesQuery = (page = 1) =>
 	queryOptions({
 		queryKey: ["movies", "upcoming", page],
 		queryFn: () => getUpcomingMovies(page),
+	});
+
+export const movieDetailsQuery = (movieId: number) =>
+	queryOptions({
+		queryKey: ["movie", movieId],
+		queryFn: () => getMovieDetails(movieId),
+		staleTime: 5 * 60 * 1000,
 	});
 // ['movie', movieId]
 

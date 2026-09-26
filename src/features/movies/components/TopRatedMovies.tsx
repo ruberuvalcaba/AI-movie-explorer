@@ -1,5 +1,6 @@
 import { MovieContainer } from "#/components/MovieContainer";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
+import { MovieSpinner } from "#/components/MovieSpinner";
 import { usePaginatedMovies } from "../hooks/usePaginatedMovies";
 import { getTopRatedMovies } from "../services";
 
@@ -16,7 +17,7 @@ export const TopRatedMovies = () => {
 	const movies = data?.pages.flatMap((page) => page.results) ?? [];
 
 	if (isPending) {
-		return <p>Loading movies...</p>;
+		return <MovieSpinner />;
 	}
 
 	if (error) {

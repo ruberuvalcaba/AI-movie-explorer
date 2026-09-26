@@ -12,7 +12,7 @@ export const MovieSectionHeader = ({
 			</span>
 
 			<span className="rounded-full border border-white/10 bg-white/[0.08] px-2.5 py-1 text-xs font-medium text-white/50 shadow-sm backdrop-blur-md">
-				{count}
+				{count}+
 			</span>
 		</h2>
 	);

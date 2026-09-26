@@ -3,5 +3,9 @@ import type { Movie } from "@/types/movie";
 
 export const useMovieStore = create((set) => ({
 	selectedMovie: null,
-	selectMovie: (movie: Movie | null) => set(() => ({ selectedMovie: movie })),
+	hoveredMovie: null,
+	setSelectMovie: (movie: Movie | null) =>
+		set(() => ({ selectedMovie: movie })),
+	setHoveredMovie: (movie: Movie | null) =>
+		set(() => ({ hoveredMovie: movie })),
 }));
