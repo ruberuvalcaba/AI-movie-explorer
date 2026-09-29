@@ -5,7 +5,7 @@ type PaginatedResponse = {
 	total_pages: number;
 };
 
-export const usePaginatedMovies = <TPage extends PaginatedResponse>(
+export const usePaginatedFetch = <TPage extends PaginatedResponse>(
 	queryKey: QueryKey,
 	queryFn: (pageParam: number) => Promise<TPage>,
 ) => {

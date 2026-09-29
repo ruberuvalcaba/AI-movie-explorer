@@ -1,4 +1,4 @@
-import type { Movie, MovieResponse } from "../../types/movie";
+import type { Movie, MovieCredits, MovieResponse } from "../../types/movie";
 import { movieApi } from "./api";
 
 export const getPopularMovies = (page: number): Promise<MovieResponse> => {
@@ -32,5 +32,11 @@ export const getUpcomingMovies = (page: number): Promise<MovieResponse> => {
 export const getMovieDetails = (movieId: number): Promise<Movie> => {
 	return movieApi<Movie>(`/movie/${movieId}`, {
 		language: "en-US",
+		// append_to_response: "videos",
 	});
 };
+export async function getMovieCredits(movieId: number) {
+	return movieApi<MovieCredits>(`/movie/${movieId}/credits`, {
+		language: "en-US",
+	});
+}

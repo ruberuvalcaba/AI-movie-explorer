@@ -4,7 +4,8 @@ import { Clock, Play, Plus, Star, X } from "lucide-react";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
 import { formatRuntime } from "../../../utils";
-import { movieDetailsQuery } from "../queries";
+import { movieCreditsQuery, movieDetailsQuery } from "../queries";
+import { MovieCast } from "./MovieCast";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
@@ -19,14 +20,18 @@ export const MovieDetails = () => {
 		isPending,
 		error,
 	} = useQuery(movieDetailsQuery(Number(movieId)));
+	//TanStack Query's dependent-query pattern
+	const movieIdFromDetails = movie?.id;
 
-	if (isPending) {
-		return <MovieSpinner />;
-	}
+	const creditsQuery = useQuery({
+		...movieCreditsQuery(movieIdFromDetails || 0),
+		enabled: !!movieIdFromDetails,
+	});
 
-	if (error) {
-		return <p>Failed to load movies: {error.message}</p>;
-	}
+	const cast = creditsQuery.data?.cast ?? [];
+
+	if (isPending) return <MovieSpinner />;
+	if (error) return <p>Failed to load movies: {error.message}</p>;
 
 	return (
 		<div className="fixed inset-0 z-50 overflow-y-auto bg-[#050507] text-white">
@@ -69,60 +74,61 @@ export const MovieDetails = () => {
 			</button>
 
 			{/* Content */}
-			<div className="relative z-10 mx-auto flex min-h-screen max-w-[1400px] items-end px-6 pb-16 pt-32 sm:px-10">
-				<div className="grid w-full gap-8 lg:grid-cols-[260px_1fr]">
-					{/* Poster */}
-					<div className="hidden overflow-hidden rounded-[24px] border border-white/15 shadow-2xl lg:block">
-						<img
-							src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
-							alt={movie.title}
-							className="aspect-[2/3] h-full w-full object-cover"
-						/>
-					</div>
-
-					{/* Details */}
-					<div className="max-w-3xl">
-						{/* Metadata */}
-						<div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
-							<span>{movie.release_date?.slice(0, 4)}</span>
-
-							<span className="h-1 w-1 rounded-full bg-white/30" />
-							<span>{movie.original_language?.toUpperCase()}</span>
-							<span className="h-1 w-1 rounded-full bg-white/30" />
-							<div className="flex items-center gap-1.5">
-								<Star size={14} className="fill-yellow-400 text-yellow-400" />
-								<span className="text-white">
-									{movie.vote_average.toFixed(1)}
-								</span>
-							</div>
-
-							<span className="h-1 w-1 rounded-full bg-white/30" />
-
-							<span>{movie.vote_count.toLocaleString()} votes</span>
+			<div className="relative z-10 mx-auto min-h-screen max-w-[1400px] items-end px-6 pb-16 pt-32">
+				<div className="mx-auto flex items-end sm:px-10">
+					<div className="grid w-full gap-8 lg:grid-cols-[260px_1fr]">
+						{/* Poster */}
+						<div className="hidden overflow-hidden rounded-[12px] border border-white/15 shadow-2xl lg:block">
+							<img
+								src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
+								alt={movie.title}
+								className="aspect-[2/3] h-full w-full object-cover"
+							/>
 						</div>
 
-						{/* Title */}
-						<h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-							{movie.title}
-						</h1>
+						{/* Details */}
+						<div className="max-w-3xl">
+							{/* Metadata */}
+							<div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
+								<span>{movie.release_date?.slice(0, 4)}</span>
 
-						{/* Tagline */}
-						{movie.tagline && (
-							<p className="mt-3 text-lg italic text-white/50">
-								{movie.tagline}
+								<span className="h-1 w-1 rounded-full bg-white/30" />
+								<span>{movie.original_language?.toUpperCase()}</span>
+								<span className="h-1 w-1 rounded-full bg-white/30" />
+								<div className="flex items-center gap-1.5">
+									<Star size={14} className="fill-yellow-400 text-yellow-400" />
+									<span className="text-white">
+										{movie.vote_average.toFixed(1)}
+									</span>
+								</div>
+
+								<span className="h-1 w-1 rounded-full bg-white/30" />
+
+								<span>{movie.vote_count.toLocaleString()} votes</span>
+							</div>
+
+							{/* Title */}
+							<h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+								{movie.title}
+							</h1>
+
+							{/* Tagline */}
+							{movie.tagline && (
+								<p className="mt-3 text-lg italic text-white/50">
+									{movie.tagline}
+								</p>
+							)}
+
+							{/* Overview */}
+							<p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+								{movie.overview}
 							</p>
-						)}
 
-						{/* Overview */}
-						<p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-							{movie.overview}
-						</p>
-
-						{/* Actions */}
-						<div className="mt-8 flex flex-wrap gap-3">
-							<button
-								type="button"
-								className="
+							{/* Actions */}
+							<div className="mt-8 flex flex-wrap gap-3">
+								<button
+									type="button"
+									className="
 									flex items-center gap-2
 									rounded-full
 									bg-white
@@ -132,14 +138,14 @@ export const MovieDetails = () => {
 									transition
 									hover:bg-white/90
 								"
-							>
-								<Play size={17} fill="currentColor" />
-								Watch Trailer
-							</button>
+								>
+									<Play size={17} fill="currentColor" />
+									Watch Trailer
+								</button>
 
-							<button
-								type="button"
-								className="
+								<button
+									type="button"
+									className="
 									flex items-center gap-2
 									rounded-full
 									border border-white/15
@@ -151,24 +157,26 @@ export const MovieDetails = () => {
 									transition
 									hover:bg-white/15
 								"
-							>
-								<Plus size={18} />
-								My List
-							</button>
-						</div>
+								>
+									<Plus size={18} />
+									My List
+								</button>
+							</div>
 
-						{/* Bottom info */}
-						<div className="mt-8 flex flex-wrap gap-3">
-							<PillContainer
-								label={formatRuntime(movie.runtime ?? 0)}
-								icon={<Clock size={15} />}
-							/>
-							{movie.genres.map((genre) => (
-								<PillContainer key={genre.id} label={genre.name} />
-							))}
+							{/* Bottom info */}
+							<div className="mt-8 flex flex-wrap gap-3">
+								<PillContainer
+									label={formatRuntime(movie.runtime ?? 0)}
+									icon={<Clock size={15} />}
+								/>
+								{movie.genres.map((genre) => (
+									<PillContainer key={genre.id} label={genre.name} />
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
+				<MovieCast cast={cast} />
 			</div>
 		</div>
 	);

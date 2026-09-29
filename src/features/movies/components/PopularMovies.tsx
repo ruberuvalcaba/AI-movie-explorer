@@ -1,7 +1,7 @@
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { MovieContainer } from "@/components/MovieContainer";
 import { MovieSectionHeader } from "@/components/MovieSectionHeader";
-import { usePaginatedMovies } from "../hooks/usePaginatedMovies";
+import { usePaginatedFetch } from "../hooks/usePaginatedFetch";
 import { getPopularMovies } from "../services";
 
 export const PopularMovies = () => {
@@ -12,7 +12,7 @@ export const PopularMovies = () => {
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = usePaginatedMovies(["movies", "popular"], getPopularMovies);
+	} = usePaginatedFetch(["movies", "popular"], getPopularMovies);
 
 	const movies = data?.pages.flatMap((page) => page.results) ?? [];
 

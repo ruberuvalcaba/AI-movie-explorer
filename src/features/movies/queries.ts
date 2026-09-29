@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
+	getMovieCredits,
 	getMovieDetails,
 	getPopularMovies,
 	getTopRatedMovies,
@@ -38,8 +39,13 @@ export const movieDetailsQuery = (movieId: number) =>
 		queryFn: () => getMovieDetails(movieId),
 		staleTime: 5 * 60 * 1000,
 	});
-// ['movie', movieId]
-
+export const movieCreditsQuery = (movieId: number) =>
+	queryOptions({
+		queryKey: ["movie", movieId, "credits"],
+		queryFn: () => getMovieCredits(movieId),
+		enabled: !!movieId,
+		staleTime: 5 * 60 * 1000,
+	});
 // ['movie', movieId, 'credits']
 
 // ['movie', movieId, 'similar']

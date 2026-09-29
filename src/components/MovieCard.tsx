@@ -18,7 +18,7 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className="group relative aspect-[2/3] w-[250px] shrink-0 overflow-hidden rounded-[20px] bg-zinc-900 shadow-xl sm:w-[250px]">
+			<div className="group relative aspect-[2/3] w-[250px] shrink-0 overflow-hidden rounded-[12px] bg-zinc-900 shadow-xl sm:w-[250px]">
 				{/* Background */}
 				<img
 					src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
