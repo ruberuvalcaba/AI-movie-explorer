@@ -1,3 +1,5 @@
+import { MovieSpinner } from "#/components/MovieSpinner";
+
 interface CastMember {
 	id: number;
 	name: string;
@@ -8,11 +10,13 @@ interface CastMember {
 
 interface MovieCastProps {
 	cast: CastMember[];
+	isLoading: boolean;
 }
 
 const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p/w342";
 
-export function MovieCast({ cast }: MovieCastProps) {
+export function MovieCast({ cast, isLoading }: MovieCastProps) {
+	if (isLoading) return <MovieSpinner />;
 	if (!cast.length) {
 		return null;
 	}

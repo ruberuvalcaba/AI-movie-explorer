@@ -1,5 +1,5 @@
 import type { Movie, MovieCredits, MovieResponse } from "../../types/movie";
-import { movieApi } from "./api";
+import { movieApi } from "./api/movie";
 
 export const getPopularMovies = (page: number): Promise<MovieResponse> => {
 	return movieApi<MovieResponse>("/movie/popular", {

@@ -43,10 +43,9 @@ export const movieCreditsQuery = (movieId: number) =>
 	queryOptions({
 		queryKey: ["movie", movieId, "credits"],
 		queryFn: () => getMovieCredits(movieId),
-		enabled: !!movieId,
+		// enabled: !!movieId, //Use it when implementing dependent-query pattern
 		staleTime: 5 * 60 * 1000,
 	});
-// ['movie', movieId, 'credits']
 
 // ['movie', movieId, 'similar']
 
