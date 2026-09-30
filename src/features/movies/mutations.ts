@@ -52,7 +52,13 @@ export const useToggleWatchlist = (movieId?: number) => {
 
 		onSettled: () => {
 			// In a real application:
-			// invalidate/refetch server state
+			// invalidate/refetch server state - invalidateQueries
+			/*
+			* If eventually watchlist is server-backed through TanStack Query:
+			queryClient.invalidateQueries({
+				queryKey: ["watchlist"],
+			});
+			*/
 		},
 	});
 };

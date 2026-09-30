@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import {
 	getMovieCredits,
 	getMovieDetails,
@@ -13,6 +13,7 @@ export const popularMoviesQuery = (page: number) =>
 	queryOptions({
 		queryKey: ["movies", "popular", page],
 		queryFn: () => getPopularMovies(page),
+		placeholderData: keepPreviousData, //Great UX improvement for pagination. keep showing the previous query's data temporarily instead of replacing it with undefined while the new data is loading.
 	});
 
 export const topRatedMoviesQuery = (page = 1) =>
@@ -37,7 +38,7 @@ export const movieDetailsQuery = (movieId: number) =>
 	queryOptions({
 		queryKey: ["movie", movieId],
 		queryFn: () => getMovieDetails(movieId),
-		staleTime: 5 * 60 * 1000,
+		staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes.
 	});
 export const movieCreditsQuery = (movieId: number) =>
 	queryOptions({

@@ -12,6 +12,8 @@ export const usePaginatedFetch = <TPage extends PaginatedResponse>(
 	return useInfiniteQuery({
 		queryKey,
 		initialPageParam: 1,
+		staleTime: 10 * 60 * 1000, // Data is considered fresh for 10 minutes.  staleTime → "When should this data be considered old?"
+		gcTime: 1000 * 60 * 30, //Data stays cached for 30 minutes. gcTime → "How long should unused data remain cached?"
 
 		queryFn: ({ pageParam }) => queryFn(pageParam),
 
