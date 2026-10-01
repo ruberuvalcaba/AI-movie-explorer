@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { saveWatchlistChange } from "./api/watchlist";
-import { useWatchlistStore } from "./store/watchlistStore";
+import { useWatchlistStore } from "./store/watchlistStore.store";
 /*
  *Mutation → simulates persisting the change to the future backend.
  * onMutate / onError / onSettled → handle the optimistic mutation lifecycle.

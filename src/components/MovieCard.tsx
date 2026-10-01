@@ -46,7 +46,7 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
 						className="
 					relative min-h-[120px]
 					flex flex-col
-					rounded-b-[20px]
+					rounded-b-[12px]
 					border-x border-b border-white/15
 					bg-white/10
 					p-3

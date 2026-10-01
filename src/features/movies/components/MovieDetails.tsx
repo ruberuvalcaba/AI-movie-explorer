@@ -1,18 +1,18 @@
 import { useQueries } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { Check, Clock, Play, Plus, Star, X } from "lucide-react";
+import { useParams } from "@tanstack/react-router";
+import { Check, Clock, Play, Plus, Star } from "lucide-react";
+import { CloseButton } from "#/components/CloseButton";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
 import { formatRuntime } from "../../../utils";
 import { useToggleWatchlist } from "../mutations";
 import { movieCreditsQuery, movieDetailsQuery } from "../queries";
-import { useWatchlistStore } from "../store/watchlistStore";
+import { useWatchlistStore } from "../store/watchlistStore.store";
 import { MovieCast } from "./MovieCast";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
 export const MovieDetails = () => {
-	const navigate = useNavigate();
 	const { movieId } = useParams({
 		from: "/movie/$movieId",
 	});
@@ -80,26 +80,7 @@ export const MovieDetails = () => {
 			</div>
 
 			{/* Close */}
-			<button
-				type="button"
-				onClick={() => navigate({ to: "/" })}
-				className="
-					fixed right-6 top-6 z-20
-					flex h-11 w-11 items-center justify-center
-					rounded-full
-					border border-white/15
-					bg-black/30
-					text-white/80
-					backdrop-blur-xl
-					transition
-					hover:bg-white/10
-					hover:text-white
-					cursor-pointer
-				"
-				aria-label="Close movie"
-			>
-				<X size={22} />
-			</button>
+			<CloseButton />
 
 			{/* Content */}
 			<div className="relative z-10 mx-auto min-h-screen max-w-[1400px] items-end px-6 pb-16 pt-32">

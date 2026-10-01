@@ -2,10 +2,14 @@ import { TopRatedMovies } from "#/features/movies/components/TopRatedMovies";
 import { TrendingMovies } from "#/features/movies/components/TrendingMovies";
 import { PopularMovies } from "@/features/movies/components/PopularMovies";
 import { UpcomingMovies } from "@/features/movies/components/UpcomingMovies";
-
+import { WatchlistButton } from "@/features/movies/components/WatchListButton";
 export const HomePage = () => {
 	return (
 		<div className="relative h-screen overflow-hidden bg-[#07070a] text-white">
+			{/* ───────────────── MENU ───────────────── */}
+			<div className="flex justify-end px-12 py-5">
+				<WatchlistButton />
+			</div>
 			{/* ───────────────── TV SCREEN / CONTENT ───────────────── */}
 			<div className="absolute inset-5 top-20 overflow-y-auto rounded-[35px]">
 				<main className="mx-auto max-w-full py-8">
