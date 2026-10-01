@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { MovieContainer } from "#/components/MovieContainer";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
 import { MovieSpinner } from "#/components/MovieSpinner";
@@ -14,7 +15,10 @@ export const TrendingMovies = () => {
 		isFetchingNextPage,
 	} = usePaginatedFetch(["movies", "trending"], getTrendingMovies);
 
-	const movies = data?.pages.flatMap((page) => page.results) ?? [];
+	const movies = useMemo(
+		() => data?.pages.flatMap((page) => page.results) ?? [],
+		[data],
+	);
 
 	if (isPending) {
 		return <MovieSpinner />;

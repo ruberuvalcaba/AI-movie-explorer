@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { memo } from "react";
 import { usePrefetchMovie } from "@/features/movies/hooks/usePrefetchMovie";
 import type { Movie } from "@/types/movie";
 
@@ -8,7 +9,7 @@ interface MovieCardProps {
 	movie: Movie;
 }
 
-export const MovieCard = ({ movie }: MovieCardProps) => {
+export const MovieCard = memo(({ movie }: MovieCardProps) => {
 	const { onMouseEnter, onMouseLeave } = usePrefetchMovie(movie.id);
 
 	return (
@@ -76,4 +77,4 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
 			</div>
 		</Link>
 	);
-};
+});

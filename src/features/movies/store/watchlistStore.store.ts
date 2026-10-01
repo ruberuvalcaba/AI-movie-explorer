@@ -9,8 +9,8 @@ interface WatchlistState {
 
 export const useWatchlistStore = create<WatchlistState>((set, get) => ({
 	movieIds: [
-		278, 1204680, 1621552, 1423191, 1368337, 1599191, 1375441, 1153576, 1307118,
-		1255833, 1492640, 1204680, 1248832,
+		278, 1621552, 1423191, 1368337, 1599191, 1375441, 1153576, 1307118, 1255833,
+		1492640, 1204680, 1248832,
 	],
 
 	addMovie: (movieId) =>
