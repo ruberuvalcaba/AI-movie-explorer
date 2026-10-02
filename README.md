@@ -10,7 +10,12 @@ Think of it as a mini IMDb/Letterboxd + AI assistant app.
 - Vercel
 - TanStack Router
 - TanStack Query
-- Vite / TanStack Start
+- React Virtual
+- Vite / TanStack Start + Nitro
+- Zod
+- TanStack AI Stack
+- Streamdown
+- MCP SDK
 - TMDB API
 
 # Getting Started
@@ -105,7 +110,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 
 - **Frontend Framework**: TanStack Start
 - **Routing**: TanStack Router
-- **State Management**: TanStack Store
+- **State Management**: Zustand
 - **Styling**: Tailwind CSS
 - **AI Integration**: Anthropic's Claude API
 
