@@ -16,6 +16,8 @@ Think of it as a mini IMDb/Letterboxd + AI assistant app.
 - TanStack AI Stack
 - Streamdown
 - MCP SDK
+- Shadcn
+- Tailwind CSS
 - TMDB API
 
 # Getting Started

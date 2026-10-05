@@ -51,3 +51,12 @@ export const movieCreditsQuery = (movieId: number) =>
 // ['movie', movieId, 'similar']
 
 // ['movies', 'search', query, filters]
+
+export const searchMoviesQuery = (title: string) =>
+	queryOptions({
+		queryKey: ["movies", "search", title],
+		queryFn: () => {
+			// Implement your search logic here, possibly calling an API with the query and filters.
+			return Promise.resolve([]); // Placeholder for actual search results.
+		},
+	});

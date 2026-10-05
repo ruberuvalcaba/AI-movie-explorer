@@ -93,3 +93,25 @@ export const MovieAssistant = () => {
 		</>
 	);
 };
+/*
+User
+ ↓
+Gemini
+ ↓
+AssistantIntent
+ ↓
+┌──────────────────────────────┐
+│ Application intent handler   │
+└──────────────┬───────────────┘
+               │
+       ┌───────┴────────┐
+       ↓                ↓
+explain_movie    recommend_movies
+       ↓                ↓
+    TMDB             TMDB
+       ↓                ↓
+    result           results
+       └───────┬────────┘
+               ↓
+          Gemini response
+*/

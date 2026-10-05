@@ -35,8 +35,23 @@ export const getMovieDetails = (movieId: number): Promise<Movie> => {
 		// append_to_response: "videos",
 	});
 };
-export async function getMovieCredits(movieId: number) {
+export const getMovieCredits = async (movieId: number) => {
 	return movieApi<MovieCredits>(`/movie/${movieId}/credits`, {
 		language: "en-US",
 	});
-}
+};
+export const searchMovieByTitle = async (
+	title: string,
+): Promise<MovieResponse> => {
+	return movieApi<MovieResponse>(`/search/movie`, {
+		language: "en-US",
+		query: title,
+		include_adult: "false",
+		page: "1",
+	});
+};
+export const getMovieRecommendations = async (movieId: number) => {
+	return movieApi<MovieResponse>(`/movie/${movieId}/recommendations`, {
+		language: "en-US",
+	});
+};

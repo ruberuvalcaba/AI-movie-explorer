@@ -1,3 +1,5 @@
+import { Streamdown } from "streamdown";
+
 interface ChatMessageProps {
 	role?: "user" | "assistant" | null;
 	content: string;
@@ -19,7 +21,7 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
 					${isUser ? "bg-white text-black" : "bg-white/10 text-white/90"}
 				`}
 			>
-				{content}
+				{!isUser ? <Streamdown>{content}</Streamdown> : content}
 			</div>
 		</div>
 	);
