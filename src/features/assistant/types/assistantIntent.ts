@@ -6,4 +6,24 @@ export const assistantIntentSchema = z.object({
 	genre: z.string().min(1).optional(),
 });
 
-export type AssistantIntent = z.infer<typeof assistantIntentSchema>;
+// export type AssistantIntent = z.infer<typeof assistantIntentSchema>;
+
+export type AssistantIntent =
+	| {
+			type: "explain_movie";
+			movieTitle: string;
+	  }
+	| {
+			type: "recommend_movies";
+			movieTitle: string;
+			genre?: string;
+	  };
+
+/*
+OUTPUT
+type AssistantIntent = {
+  type: "explain_movie" | "recommend_movies";
+  movieTitle: string;
+  genre?: string;
+};
+*/

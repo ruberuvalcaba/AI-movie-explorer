@@ -1,6 +1,8 @@
 import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import { MovieCard } from "#/components/MovieCard";
+import { assistantResponseSchema } from "#/features/assistant/types/assistantResponse";
 import { formatAiError } from "../../../utils";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
@@ -10,6 +12,7 @@ export const MovieAssistant = () => {
 
 	const { messages, sendMessage, isLoading, error } = useChat({
 		connection: fetchServerSentEvents("/ai"),
+		outputSchema: assistantResponseSchema,
 	});
 
 	return (
@@ -38,15 +41,43 @@ export const MovieAssistant = () => {
 					<div className="flex-1 space-y-3 overflow-y-auto p-4">
 						{messages.map((message) =>
 							message.parts.map((part, index) => {
-								if (part.type !== "text") return null;
+								const key = `${message.id}-${index}`;
 
-								return (
-									<ChatMessage
-										key={`${message.id}-${index}`}
-										role={message.role === "user" ? "user" : "assistant"}
-										content={part.content}
-									/>
-								);
+								if (part.type === "text") {
+									return (
+										<ChatMessage
+											key={key}
+											role={message.role === "user" ? "user" : "assistant"}
+											content={part.content}
+										/>
+									);
+								}
+
+								if (part.type === "structured-output") {
+									const response = part.data;
+
+									if (!response) {
+										return null;
+									}
+
+									return (
+										<div key={key} className="space-y-3">
+											<ChatMessage content={response.message} />
+
+											{response?.movies?.length > 0 && (
+												<div className="flex gap-3 overflow-x-auto pb-2">
+													{response.movies.map((movie) => (
+														<div key={movie.id} className="shrink-0">
+															<MovieCard movie={movie} isMini={true} />
+														</div>
+													))}
+												</div>
+											)}
+										</div>
+									);
+								}
+
+								return null;
 							}),
 						)}
 

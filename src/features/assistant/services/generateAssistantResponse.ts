@@ -2,6 +2,7 @@ import { chat } from "@tanstack/ai";
 import { geminiText } from "@tanstack/ai-gemini";
 
 import type { AssistantIntent } from "#/features/assistant/types/assistantIntent";
+import { assistantMessageSchema } from "../types/assistantResponse";
 
 interface GenerateAssistantResponseParams {
 	userMessage: string;
@@ -12,32 +13,37 @@ interface GenerateAssistantResponseParams {
 const SYSTEM_PROMPT = `
 You are an AI Movie Assistant.
 
-Answer the user's movie-related request using ONLY the movie data
-provided by the application.
+Generate a concise conversational response to the user's request.
 
-Do not invent movie facts, ratings, release dates, genres, actors,
-or recommendations.
+Use ONLY the movie data provided by the application.
 
-Be concise, conversational, and useful.
+Do not invent movie facts, ratings, release dates, genres,
+actors, or recommendations.
 
-If the user asked for recommendations:
-- Explain briefly why the recommended movies are relevant.
-- Mention the movie titles clearly.
-- Do not claim that a movie is recommended by TMDB for a reason
-  that is not supported by the provided data.
+Return an object containing only:
 
-If the user asked for an explanation:
-- Explain the movie using the provided movie information.
-- Do not invent details that are not present in the provided data.
+{
+  "message": "..."
+}
+
+If recommendations are provided:
+- Mention that you are recommending movies based on the requested movie.
+- Mention the movie titles naturally when useful.
+- Keep the response concise because the UI will render the actual
+  movie cards separately.
+
+Do not return movie IDs.
+Do not return poster paths.
+Do not create movie objects.
 `;
 
 export function generateAssistantResponse({
+	userMessage,
 	intent,
 	result,
-	userMessage,
 }: GenerateAssistantResponseParams) {
 	return chat({
-		adapter: geminiText("gemini-3.8-flash"),
+		adapter: geminiText("gemini-3.5-flash-lite"),
 		systemPrompts: [SYSTEM_PROMPT],
 		messages: [
 			{
@@ -49,5 +55,7 @@ export function generateAssistantResponse({
 				}),
 			},
 		],
+		outputSchema: assistantMessageSchema,
+		stream: true,
 	});
 }

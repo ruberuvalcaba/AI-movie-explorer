@@ -50,7 +50,9 @@ export const searchMovieByTitle = async (
 		page: "1",
 	});
 };
-export const getMovieRecommendations = async (movieId: number) => {
+export const getMovieRecommendations = async (
+	movieId: number,
+): Promise<MovieResponse> => {
 	return movieApi<MovieResponse>(`/movie/${movieId}/recommendations`, {
 		language: "en-US",
 	});

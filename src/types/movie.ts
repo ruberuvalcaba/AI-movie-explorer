@@ -10,7 +10,7 @@ export interface Movie {
 	popularity: number;
 	// Movie details
 	adult: boolean;
-	belongs_to_collection: MovieCollection | null;
+	belongs_to_collection?: MovieCollection | null;
 	budget: number;
 	genres: MovieGenre[];
 	homepage: string | null;
@@ -18,15 +18,23 @@ export interface Movie {
 	origin_country: string[];
 	original_language: string;
 	original_title: string;
-	production_companies: ProductionCompany[];
-	production_countries: ProductionCountry[];
+	production_companies?: ProductionCompany[];
+	production_countries?: ProductionCountry[];
 	revenue: number;
 	runtime: number | null;
 	softcore: boolean;
-	spoken_languages: SpokenLanguage[];
+	spoken_languages?: SpokenLanguage[];
 	status: string;
 	tagline: string | null;
 	video: boolean;
+}
+
+export interface MiniMovie {
+	id: number;
+	title: string;
+	poster_path: string | null;
+	vote_average: number;
+	release_date: string;
 }
 
 export interface MovieCollection {

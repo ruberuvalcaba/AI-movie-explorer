@@ -9,6 +9,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { executeAssistantIntent } from "#/features/assistant/services/executeAssistantIntent";
 import { generateAssistantResponse } from "#/features/assistant/services/generateAssistantResponse";
 import { assistantIntentSchema } from "#/features/assistant/types/assistantIntent";
+import type { AssistantResult } from "#/features/assistant/types/assistantResult";
 
 const SYSTEM_PROMPT = `
 You are the intent classifier for an AI Movie Assistant.
@@ -31,6 +32,57 @@ Rules:
 - Do not generate natural-language explanations.
 - Only return the structured intent.
 `;
+function extractAssistantMovies(result: unknown) {
+	if (
+		typeof result === "object" &&
+		result !== null &&
+		"movies" in result &&
+		Array.isArray(result.movies)
+	) {
+		return result.movies.map((movie) => ({
+			id: movie.id,
+			title: movie.title,
+			poster_path: movie.poster_path,
+			release_date: movie.release_date,
+			vote_average: movie.vote_average,
+		}));
+	}
+
+	return [];
+}
+function addMoviesToResponseStream(
+	stream: ReturnType<typeof generateAssistantResponse>,
+	result: AssistantResult,
+) {
+	return (async function* () {
+		for await (const chunk of stream) {
+			if (
+				chunk.type === "CUSTOM" &&
+				chunk.name === "structured-output.complete"
+			) {
+				const movieData = extractAssistantMovies(result);
+
+				const response = {
+					message: chunk.value.object.message,
+					movies: movieData,
+				};
+
+				yield {
+					...chunk,
+					value: {
+						...chunk.value,
+						object: response,
+						raw: JSON.stringify(response),
+					},
+				};
+
+				continue;
+			}
+
+			yield chunk;
+		}
+	})();
+}
 
 export const Route = createFileRoute("/ai")({
 	server: {
@@ -59,7 +111,9 @@ export const Route = createFileRoute("/ai")({
 				});
 
 				// 4. Stream the final response to the client.
-				return toServerSentEventsResponse(stream);
+				const responseStream = addMoviesToResponseStream(stream, result);
+
+				return toServerSentEventsResponse(responseStream);
 			},
 		},
 	},
