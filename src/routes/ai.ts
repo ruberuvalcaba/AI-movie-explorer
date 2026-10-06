@@ -8,9 +8,11 @@ import { geminiText } from "@tanstack/ai-gemini";
 import { createFileRoute } from "@tanstack/react-router";
 import { executeAssistantIntent } from "#/features/assistant/services/executeAssistantIntent";
 import { generateAssistantResponse } from "#/features/assistant/services/generateAssistantResponse";
+import type { AssistantContext } from "#/features/assistant/types/assistantContext";
 import { assistantIntentSchema } from "#/features/assistant/types/assistantIntent";
 import type { AssistantResult } from "#/features/assistant/types/assistantResult";
 
+//This classifier prompt only determine the intent; it shouldn't control how the final response is phrased.
 const SYSTEM_PROMPT = `
 You are the intent classifier for an AI Movie Assistant.
 
@@ -88,7 +90,16 @@ export const Route = createFileRoute("/ai")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				const { messages } = await chatParamsFromRequest(request);
+				const { messages, forwardedProps } =
+					await chatParamsFromRequest(request);
+				// 0. Extract the movieId from the request URL if present.
+				const movieId =
+					typeof forwardedProps.movieId === "number"
+						? forwardedProps.movieId
+						: undefined;
+				const context: AssistantContext = {
+					movieId,
+				};
 				// 1. Understand the user's request.
 				const intent = await chat({
 					adapter: geminiText("gemini-3.5-flash-lite"), //The short geminiText() factory automatically looks for GEMINI_API_KEY or GOOGLE_API_KEY in the environment. TanStack's current docs explicitly describe this behavior.
@@ -97,7 +108,7 @@ export const Route = createFileRoute("/ai")({
 					outputSchema: assistantIntentSchema,
 				});
 				// 2. Execute application logic.
-				const result = await executeAssistantIntent(intent);
+				const result = await executeAssistantIntent(intent, context);
 
 				// 3. Generate the final conversational response.
 				const lastUserMessage = [...messages]

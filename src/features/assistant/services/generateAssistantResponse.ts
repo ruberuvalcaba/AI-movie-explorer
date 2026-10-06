@@ -26,9 +26,22 @@ Return an object containing only:
   "message": "..."
 }
 
-If recommendations are provided:
-- Mention that you are recommending movies based on the requested movie.
-- Mention the movie titles naturally when useful.
+Recommendation response rules:
+
+- If recommendations are based on an explicitly named movie,
+  mention that movie by name when appropriate.
+
+- If recommendations are based on the current movie context
+  (movieId) and the user did not explicitly provide a movie title,
+  you MUST make it clear that the recommendations are based on
+  the movie the user is currently viewing.
+
+- In that case, you may say something like:
+  "Here are some movies I recommend based on the movie you're seeing."
+
+- If the current movie's title is available in the provided movie data,
+  prefer mentioning the title naturally.
+
 - Keep the response concise because the UI will render the actual
   movie cards separately.
 

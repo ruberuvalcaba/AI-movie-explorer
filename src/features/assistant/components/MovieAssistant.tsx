@@ -1,4 +1,5 @@
 import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
+import { useLocation } from "@tanstack/react-router";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { MovieCard } from "#/components/MovieCard";
@@ -9,9 +10,14 @@ import { ChatMessage } from "./ChatMessage";
 
 export const MovieAssistant = () => {
 	const [isOpen, setIsOpen] = useState(true);
+	const location = useLocation();
+	const movieId = location.pathname.match(/^\/movie\/(\d+)$/)?.[1];
 
 	const { messages, sendMessage, isLoading, error } = useChat({
 		connection: fetchServerSentEvents("/ai"),
+		forwardedProps: {
+			movieId: movieId ? Number(movieId) : undefined,
+		},
 		outputSchema: assistantResponseSchema,
 	});
 
