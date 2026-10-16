@@ -3,7 +3,7 @@ import { memo } from "react";
 import { usePrefetchMovie } from "@/features/movies/hooks/usePrefetchMovie";
 import type { MiniMovie, Movie } from "@/types/movie";
 
-const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w300";
 
 interface MovieCardProps {
 	movie: Movie;
@@ -40,6 +40,8 @@ export const MovieCard = memo((props: Props) => {
 					src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
 					alt={movie.title}
 					className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+					loading="lazy"
+					decoding="async"
 				/>
 
 				{/* Cinematic overlay */}

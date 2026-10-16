@@ -1,7 +1,7 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { Check, Clock, Play, Plus, Star } from "lucide-react";
-import { CloseButton } from "#/components/CloseButton";
+import { Check, ChevronLeft, Clock, Play, Plus, Star } from "lucide-react";
+import { IconButton } from "#/components/IconButton";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
 import { formatRuntime } from "../../../utils";
@@ -79,11 +79,9 @@ export const MovieDetails = () => {
 				<div className="absolute inset-0 bg-gradient-to-r from-[#050507]/90 via-transparent to-[#050507]/40" />
 			</div>
 
-			{/* Close */}
-			<CloseButton />
-
 			{/* Content */}
 			<div className="relative z-10 mx-auto min-h-screen max-w-[1400px] items-end px-6 pb-16 pt-32">
+				<IconButton title="Close" icon={ChevronLeft} />
 				<div className="mx-auto flex items-end sm:px-10">
 					<div className="grid w-full gap-8 lg:grid-cols-[260px_1fr]">
 						{/* Poster */}

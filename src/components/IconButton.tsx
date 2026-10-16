@@ -1,28 +1,38 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Bookmark } from "lucide-react";
-import { useWatchlistStore } from "../store/watchlistStore.store";
+import type { LucideIcon } from "lucide-react";
 
-export const WatchlistButton = () => {
+type IconButtonProps = {
+	title?: string;
+	count?: number | string;
+	icon: LucideIcon;
+	route?: string;
+};
+
+export const IconButton = ({
+	title = "",
+	icon: Icon,
+	count,
+	route,
+}: IconButtonProps) => {
 	const navigate = useNavigate();
-	const movieCount = useWatchlistStore((state) => state.movieIds.length);
 
 	return (
 		<button
 			type="button"
-			onClick={() => navigate({ to: "/watchlist" })}
-			aria-label={`My Watchlist${movieCount ? `, ${movieCount} movies` : ""}`}
-			title="My Watchlist"
+			onClick={() => navigate({ to: route || "/" })}
+			aria-label={`${title}${count ? `, ${count} items` : ""}`}
+			title={title}
 			className="cursor-pointer group relative flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white"
 		>
-			<Bookmark
+			<Icon
 				size={18}
 				strokeWidth={1.8}
 				className="transition-transform duration-200 group-hover:scale-110"
 			/>
 
-			{movieCount > 0 && (
+			{count && Number(count) > 0 && (
 				<span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold text-black">
-					{movieCount}
+					{count}
 				</span>
 			)}
 		</button>

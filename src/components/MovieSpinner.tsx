@@ -2,7 +2,7 @@ import { Film } from "lucide-react";
 
 export const MovieSpinner = () => {
 	return (
-		<div className="flex items-center justify-center p-8">
+		<div className="flex min-h-screen w-full items-center justify-center">
 			<div className="relative h-16 w-16">
 				{/* Ambient glow */}
 				<div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl" />

@@ -6,7 +6,10 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { Film } from "lucide-react";
+import { Bookmark } from "lucide-react";
+import { IconButton } from "#/components/IconButton";
+import { useWatchlistStore } from "#/features/movies/store/watchlistStore.store";
+import { HomeButton } from "@/components/HomeButton";
 import { MovieAssistant } from "@/features/assistant/components/MovieAssistant";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
@@ -39,24 +42,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	shellComponent: RootDocument,
 });
 
-// <div className="absolute flex z-50 items-center justify-center cursor-pointer">
-// 					<div className="relative h-14 w-14">
-// 						{/* Ambient glow */}
-// 						<div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl" />
-
-// 						{/* Outer ring */}
-// 						<div className="absolute inset-0 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-xl" />
-
-// 						{/* Spinning reel */}
-// 						<div className="relative flex h-full w-full items-center justify-center">
-// 							<Film size={30} strokeWidth={1.5} className="text-white/80" />
-// 						</div>
-
-// 						{/* Center glow */}
-// 						<div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
-// 					</div>
-// 				</div>
-
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
@@ -65,6 +50,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				{children}
+				{/* ───────────────── MENU ───────────────── */}
+				<div className="fixed w-full flex z-50 top-0 justify-end px-12 py-5 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
+					<IconButton
+						title="My watchlist"
+						icon={Bookmark}
+						count={useWatchlistStore((state) => state.movieIds.length)}
+						route="/watchlist"
+					/>
+					<HomeButton />
+				</div>
 				{/* AI */}
 				<MovieAssistant />
 				<TanStackDevtools

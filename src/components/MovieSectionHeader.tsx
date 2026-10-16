@@ -6,7 +6,7 @@ export const MovieSectionHeader = ({
 	count: number | string;
 }) => {
 	return (
-		<h2 className="mb-6 flex items-center gap-3">
+		<h2 className="py-6 flex items-center gap-3 px-7">
 			<span className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
 				{title}
 			</span>

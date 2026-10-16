@@ -2,17 +2,12 @@ import { TopRatedMovies } from "#/features/movies/components/TopRatedMovies";
 import { TrendingMovies } from "#/features/movies/components/TrendingMovies";
 import { PopularMovies } from "@/features/movies/components/PopularMovies";
 import { UpcomingMovies } from "@/features/movies/components/UpcomingMovies";
-import { WatchlistButton } from "@/features/movies/components/WatchListButton";
 export const HomePage = () => {
 	return (
-		<div className="relative h-screen overflow-hidden bg-[#07070a] text-white">
-			{/* ───────────────── MENU ───────────────── */}
-			<div className="flex justify-end px-12 py-5">
-				<WatchlistButton />
-			</div>
+		<div className="relative h-screen overflow-hidden bg-[#141414] text-white">
 			{/* ───────────────── TV SCREEN / CONTENT ───────────────── */}
-			<div className="absolute inset-5 top-20 overflow-y-auto rounded-[35px]">
-				<main className="mx-auto max-w-full py-8">
+			<div className="absolute inset-5 top-20 overflow-y-auto bg-[#222222] rounded-[35px]">
+				<main className="mx-auto max-w-full mb-8 rounded-[35px]">
 					<PopularMovies />
 					<TopRatedMovies />
 					<TrendingMovies />
@@ -35,15 +30,7 @@ export const HomePage = () => {
 					<rect width="100%" height="100%" filter="url(#noise)" />
 				</svg>
 				{/* Top TV bezel / glow */}
-				<div
-					className="
-		absolute inset-x-0 top-0 h-32
-		bg-gradient-to-b
-		from-[#07070a]
-		via-[#07070a]/95
-		to-transparent
-	"
-				/>
+				<div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#07070a] via-[#07070a]/95 to-transparent rounded-[35px]" />
 
 				{/* Ambient glow */}
 				<div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-purple-300/30 blur-[120px]" />

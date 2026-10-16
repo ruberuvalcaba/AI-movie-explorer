@@ -9,11 +9,13 @@ if (!token) {
 export const movieApi = async <T>(
 	endpoint: string,
 	params?: Record<string, string>,
+	signal?: AbortSignal,
 ): Promise<T> => {
 	const searchParams = new URLSearchParams(params);
 	const url = `${TMDB_BASE_URL}${endpoint}?${searchParams}`;
 
 	const response = await fetch(url, {
+		signal,
 		headers: {
 			Authorization: `Bearer ${token}`,
 			accept: "application/json",

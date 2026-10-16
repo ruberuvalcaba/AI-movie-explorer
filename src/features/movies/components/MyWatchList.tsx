@@ -1,5 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
-import { CloseButton } from "#/components/CloseButton";
+import { ChevronLeft } from "lucide-react";
+import { IconButton } from "#/components/IconButton";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { MovieCard } from "@/components/MovieCard";
@@ -22,9 +23,11 @@ export function MyWatchlist() {
 	}
 
 	return (
-		<main className="mx-auto max-w-7xl py-12 mt-8">
-			<CloseButton />
-			<MovieSectionHeader title="My Watchlist" count={movies?.length} />
+		<main className="mx-auto max-w-7xl my-20">
+			<div className="flex items-center">
+				<IconButton title="Close" icon={ChevronLeft} />
+				<MovieSectionHeader title="My Watchlist" count={movies?.length} />
+			</div>
 			{!movieIds.length ? (
 				<p>Your watchlist is empty.</p>
 			) : (
