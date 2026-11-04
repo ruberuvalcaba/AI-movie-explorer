@@ -13,10 +13,6 @@ export const assistantResponseSchema = z.object({
 	movies: z.array(assistantMovieSchema),
 });
 
-export const assistantMessageSchema = z.object({
-	message: z.string(),
-});
-
 export type AssistantResponse = z.infer<typeof assistantResponseSchema>;
 
 /*

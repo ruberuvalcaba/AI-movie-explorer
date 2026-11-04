@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { MovieContainer } from "@/components/MovieContainer";
 import { MovieSectionHeader } from "@/components/MovieSectionHeader";
+import { getPopularMoviesServerFn } from "../api/movie.functions";
 import { usePaginatedFetch } from "../hooks/usePaginatedFetch";
-import { getPopularMovies } from "../services";
 
 export const PopularMovies = () => {
 	const {
@@ -13,7 +13,9 @@ export const PopularMovies = () => {
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = usePaginatedFetch(["movies", "popular"], getPopularMovies);
+	} = usePaginatedFetch(["movies", "popular"], (page) =>
+		getPopularMoviesServerFn({ data: { page } }),
+	);
 
 	const movies = useMemo(
 		() => data?.pages.flatMap((page) => page.results) ?? [],

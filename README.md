@@ -37,6 +37,17 @@ To build this application for production:
 npm run build
 ```
 
+## Capabilities
+
+| Capability             | Main skill                |
+| ---------------------- | ------------------------- |
+| Movie Explorer         | React + API architecture  |
+| Advanced data layer    | TanStack Query            |
+| Personal Movie Library | Zustand                   |
+| AI Assistant           | LLM integration           |
+| AI Agent + MCP         | Tool calling / MCP        |
+| Real-time + hardening  | Architecture / production |
+
 ## Styling
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
@@ -76,7 +87,19 @@ unprefixed so they remain server-only.
 
 # TanStack Chat Application
 
-Am example chat application built with TanStack Start, TanStack Store, and Claude AI.
+User
+↓
+Gemini (LLM)
+↓
+MCP Client
+↓
+MCP Server
+↓
+TMDB API
+↓
+Gemini generates response
+↓
+React UI + Movie Cards
 
 ## .env Updates
 

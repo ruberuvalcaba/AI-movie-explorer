@@ -1,61 +1,34 @@
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js'
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 
 export async function handleMcpRequest(
-  request: Request,
-  server: McpServer,
+	request: Request,
+	server: McpServer,
 ): Promise<Response> {
-  try {
-    const jsonRpcRequest = (await request.json()) as JSONRPCMessage
+	const transport = new WebStandardStreamableHTTPServerTransport({
+		sessionIdGenerator: undefined,
+		enableJsonResponse: true,
+	});
 
-    const [clientTransport, serverTransport] =
-      InMemoryTransport.createLinkedPair()
+	try {
+		await server.connect(transport);
 
-    let responseData: JSONRPCMessage | null = null
+		return await transport.handleRequest(request);
+	} catch (error) {
+		console.error("MCP handler error:", error);
 
-    clientTransport.onmessage = (message: JSONRPCMessage) => {
-      responseData = message
-    }
-
-    await server.connect(serverTransport)
-
-    await clientTransport.start()
-    await serverTransport.start()
-
-    await clientTransport.send(jsonRpcRequest)
-
-    await new Promise((resolve) => setTimeout(resolve, 10))
-
-    await clientTransport.close()
-    await serverTransport.close()
-
-    return Response.json(responseData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  } catch (error) {
-    console.error('MCP handler error:', error)
-
-    // Return a JSON-RPC error response
-    return Response.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32603,
-          message: 'Internal server error',
-          data: error instanceof Error ? error.message : String(error),
-        },
-        id: null,
-      },
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-  }
+		return Response.json(
+			{
+				jsonrpc: "2.0",
+				error: {
+					code: -32603,
+					message: "Internal server error",
+				},
+				id: null,
+			},
+			{ status: 500 },
+		);
+	} finally {
+		await Promise.allSettled([transport.close(), server.close()]);
+	}
 }

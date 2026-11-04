@@ -15,11 +15,13 @@
     "check": "biome check"
   },
   "dependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/ai": "latest",
     "@tanstack/ai-client": "latest",
     "@tanstack/ai-gemini": "latest",
+    "@tanstack/ai-mcp": "^0.7.0",
     "@tanstack/ai-react": "latest",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-query": "latest",
