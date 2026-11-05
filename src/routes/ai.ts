@@ -45,12 +45,14 @@ export const Route = createFileRoute("/ai")({
 							: undefined,
 				};
 
-				const lastUserMessage = [...messages]
-					.reverse()
-					.find((message) => message.role === "user");
+				const userMessages = messages
+					.filter((message) => message.role === "user")
+					.map(validateLastUserMessage)
+					.filter((message) => message.trim().length > 0);
 
 				const stream = await generateMcpAssistantResponse({
-					userMessage: validateLastUserMessage(lastUserMessage),
+					userMessage: userMessages.at(-1) ?? "",
+					previousUserMessages: userMessages.slice(0, -1).slice(-10),
 					context,
 				});
 

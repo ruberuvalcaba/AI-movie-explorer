@@ -7,6 +7,7 @@ import { mcpAssistantResponseSchema } from "../types/mcpAssistantResponse";
 
 interface Params {
 	userMessage: string;
+	previousUserMessages?: string[];
 	context: AssistantContext;
 }
 
@@ -15,6 +16,19 @@ You are an AI Movie Assistant.
 
 You have access to MCP tools for searching movies,
 retrieving movie details, and finding recommendations.
+
+Language rules:
+- Write the message in the same language as the user's current request, including English and Spanish.
+- If the user explicitly requests a response language, use that language instead.
+- For ambiguous or language-neutral requests such as "OK" or a movie title alone,
+  use previousUserMessages (oldest to newest) to infer the most recent language preference.
+- If no language can be inferred, use English.
+- previousUserMessages provide language context only; answer the current request.
+- Apply these rules to explanations, recommendations, and clarification questions,
+  even when tool results are in English.
+- Keep JSON property names unchanged and preserve movie titles as returned by tools.
+- For example, "Recomiéndame películas como Interstellar" requires a Spanish message;
+  "Recommend movies like Interstellar" requires an English message.
 
 Movie resolution:
 - If the user explicitly names a movie, search for it to obtain its ID.
@@ -55,6 +69,7 @@ Structured response:
 
 export async function generateMcpAssistantResponse({
 	userMessage,
+	previousUserMessages = [],
 	context,
 }: Params) {
 	const mcpClient = await createMovieMcpClient();
@@ -67,6 +82,7 @@ export async function generateMcpAssistantResponse({
 				role: "user",
 				content: JSON.stringify({
 					request: userMessage,
+					previousUserMessages,
 					currentMovieId: context.movieId ?? null,
 				}),
 			},
