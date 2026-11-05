@@ -1,12 +1,12 @@
 import { Streamdown } from "streamdown";
 
 interface ChatMessageProps {
-	role?: "user" | "assistant" | null;
+	interaction?: "user" | "assistant" | null;
 	content: string;
 }
 
-export const ChatMessage = ({ role, content }: ChatMessageProps) => {
-	const isUser = role === "user";
+export const ChatMessage = ({ interaction, content }: ChatMessageProps) => {
+	const isUser = interaction === "user";
 
 	return (
 		<div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
