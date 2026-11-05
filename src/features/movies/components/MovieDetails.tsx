@@ -1,6 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { Check, ChevronLeft, Clock, Play, Plus, Star } from "lucide-react";
+import { Check, ChevronLeft, Clock, Plus, Star } from "lucide-react";
 import { IconButton } from "#/components/IconButton";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
@@ -9,6 +9,7 @@ import { useToggleWatchlist } from "../mutations";
 import { movieCreditsQuery, movieDetailsQuery } from "../queries";
 import { useWatchlistStore } from "../store/watchlistStore.store";
 import { MovieCast } from "./MovieCast";
+import { MovieTrailer } from "./MovieTrailer";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
@@ -133,22 +134,11 @@ export const MovieDetails = () => {
 
 							{/* Actions */}
 							<div className="mt-8 flex flex-wrap gap-3">
-								<button
-									type="button"
-									className="
-									flex items-center gap-2
-									rounded-full
-									bg-white
-									px-6 py-3
-									text-sm font-semibold
-									text-black
-									transition
-									hover:bg-white/90
-								"
-								>
-									<Play size={17} fill="currentColor" />
-									Watch Trailer
-								</button>
+								<MovieTrailer
+									key={movie.id}
+									movieTitle={movie.title}
+									videos={movie.videos?.results ?? []}
+								/>
 
 								<button
 									type="button"

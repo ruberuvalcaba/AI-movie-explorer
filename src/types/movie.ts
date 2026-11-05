@@ -27,6 +27,7 @@ export interface Movie {
 	status: string;
 	tagline: string | null;
 	video: boolean;
+	videos?: { results: MovieVideo[] };
 }
 
 export interface MiniMovie {
@@ -91,4 +92,13 @@ export interface CrewMember {
 	name: string;
 	job: string;
 	department: string;
+}
+
+export interface MovieVideo {
+	id: string;
+	key: string;
+	name: string;
+	site: string;
+	type: string;
+	official: boolean;
 }

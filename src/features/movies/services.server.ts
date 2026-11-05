@@ -32,7 +32,7 @@ export const getUpcomingMovies = (page: number): Promise<MovieResponse> => {
 export const getMovieDetails = (movieId: number): Promise<Movie> => {
 	return movieApiServer<Movie>(`/movie/${movieId}`, {
 		language: "en-US",
-		// append_to_response: "videos",
+		append_to_response: "videos",
 	});
 };
 export const getMovieCredits = async (movieId: number) => {
