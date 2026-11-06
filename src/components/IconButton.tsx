@@ -6,6 +6,7 @@ type IconButtonProps = {
 	count?: number | string;
 	icon: LucideIcon;
 	route?: string;
+	type?: "button" | "submit" | "reset";
 };
 
 export const IconButton = ({
@@ -13,13 +14,14 @@ export const IconButton = ({
 	icon: Icon,
 	count,
 	route,
+	type = "button",
 }: IconButtonProps) => {
 	const navigate = useNavigate();
 
 	return (
 		<button
-			type="button"
-			onClick={() => navigate({ to: route || "/" })}
+			type={type}
+			onClick={route ? () => navigate({ to: route }) : undefined}
 			aria-label={`${title}${count ? `, ${count} items` : ""}`}
 			title={title}
 			className="cursor-pointer group relative flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white"

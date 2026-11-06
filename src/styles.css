@@ -109,6 +109,21 @@ body::before {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Browser autofill backgrounds override bg-transparent. Clip their paint to
+   the text so the search field keeps showing its translucent container. */
+#movie-search:is(:autofill, :-webkit-autofill) {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+}
+
+/* Keep clearing in the explicit search controls instead of the native icon. */
+#movie-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* Firefox */
 
 * {

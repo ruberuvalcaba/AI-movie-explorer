@@ -8,6 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Bookmark } from "lucide-react";
 import { IconButton } from "#/components/IconButton";
+import { MovieSearchBar } from "#/features/movies/components/MovieSearchBar";
 import { useWatchlistStore } from "#/features/movies/store/watchlistStore.store";
 import { HomeButton } from "@/components/HomeButton";
 import { MovieAssistant } from "@/features/assistant/components/MovieAssistant";
@@ -52,14 +53,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body>
 				{children}
 				{/* ───────────────── MENU ───────────────── */}
-				<div className="fixed w-full flex z-50 top-0 justify-end px-4 py-5 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
-					<IconButton
-						title="My watchlist"
-						icon={Bookmark}
-						count={useWatchlistStore((state) => state.movieIds.length)}
-						route="/watchlist"
-					/>
+				<div className="fixed w-full flex items-center gap-2 z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<HomeButton />
+					<MovieSearchBar />
+					<div className="shrink-0">
+						<IconButton
+							title="My watchlist"
+							icon={Bookmark}
+							count={useWatchlistStore((state) => state.movieIds.length)}
+							route="/watchlist"
+						/>
+					</div>
 				</div>
 				{/* AI */}
 				<MovieAssistant />

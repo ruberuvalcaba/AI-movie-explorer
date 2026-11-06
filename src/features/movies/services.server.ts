@@ -42,12 +42,13 @@ export const getMovieCredits = async (movieId: number) => {
 };
 export const searchMovieByTitle = async (
 	title: string,
+	page = 1,
 ): Promise<MovieResponse> => {
 	return movieApiServer<MovieResponse>(`/search/movie`, {
 		language: "en-US",
 		query: title,
 		include_adult: "false",
-		page: "1",
+		page: String(page),
 	});
 };
 export const getMovieRecommendations = async (

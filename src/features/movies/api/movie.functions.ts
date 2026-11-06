@@ -7,6 +7,7 @@ import {
 	getTopRatedMovies,
 	getTrendingMovies,
 	getUpcomingMovies,
+	searchMovieByTitle,
 } from "../services.server";
 // import { movieApiServer } from "./movie.server";
 
@@ -81,3 +82,12 @@ export const getMovieCreditsServerFn = createServerFn({
 	.handler(async ({ data }) => {
 		return getMovieCredits(data.movieId);
 	});
+
+export const searchMoviesServerFn = createServerFn({ method: "GET" })
+	.validator(
+		z.object({
+			query: z.string().trim().min(1).max(200),
+			page: z.number().int().min(1).default(1),
+		}),
+	)
+	.handler(async ({ data }) => searchMovieByTitle(data.query, data.page));

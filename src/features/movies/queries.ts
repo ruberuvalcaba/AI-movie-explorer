@@ -1,4 +1,8 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import {
+	infiniteQueryOptions,
+	keepPreviousData,
+	queryOptions,
+} from "@tanstack/react-query";
 import {
 	getMovieCreditsServerFn,
 	getMovieDetailsServerFn,
@@ -6,6 +10,7 @@ import {
 	getTopRatedMoviesServerFn,
 	getTrendingMoviesServerFn,
 	getUpcomingMoviesServerFn,
+	searchMoviesServerFn,
 } from "./api/movie.functions";
 //Currently unsused quries, but used for: const { data, isPending, error } = useQuery(topRatedMoviesQuery(1));
 //Query options factory
@@ -53,10 +58,13 @@ export const movieCreditsQuery = (movieId: number) =>
 // ['movies', 'search', query, filters]
 
 export const searchMoviesQuery = (title: string) =>
-	queryOptions({
-		queryKey: ["movies", "search", title],
-		queryFn: () => {
-			// Implement your search logic here, possibly calling an API with the query and filters.
-			return Promise.resolve([]); // Placeholder for actual search results.
-		},
+	infiniteQueryOptions({
+		queryKey: ["movies", "search", title.trim()],
+		enabled: title.trim().length > 0,
+		initialPageParam: 1,
+		queryFn: ({ pageParam }) =>
+			searchMoviesServerFn({ data: { query: title.trim(), page: pageParam } }),
+		getNextPageParam: (lastPage) =>
+			lastPage.page < lastPage.total_pages ? lastPage.page + 1 : undefined,
+		staleTime: 5 * 60 * 1000,
 	});

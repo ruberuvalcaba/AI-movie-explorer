@@ -25,7 +25,7 @@ export function MyWatchlist() {
 	return (
 		<main className="mx-auto my-20 max-w-7xl px-4 pb-20 sm:px-6">
 			<div className="flex items-center">
-				<IconButton title="Close" icon={ChevronLeft} />
+				<IconButton title="Close" icon={ChevronLeft} route="/" />
 				<MovieSectionHeader title="My Watchlist" count={movies?.length} />
 			</div>
 			{!movieIds.length ? (

@@ -1,3 +1,4 @@
+import { MovieSearch } from "#/features/movies/components/MovieSearch";
 import { TopRatedMovies } from "#/features/movies/components/TopRatedMovies";
 import { TrendingMovies } from "#/features/movies/components/TrendingMovies";
 import { PopularMovies } from "@/features/movies/components/PopularMovies";
@@ -8,10 +9,12 @@ export const HomePage = () => {
 			{/* ───────────────── TV SCREEN / CONTENT ───────────────── */}
 			<div className="absolute inset-2 top-20 overflow-x-hidden overflow-y-auto bg-[#222222] rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px]">
 				<main className="mx-auto mb-8 min-w-0 max-w-full rounded-2xl sm:rounded-[35px]">
-					<PopularMovies />
-					<TopRatedMovies />
-					<TrendingMovies />
-					<UpcomingMovies />
+					<MovieSearch>
+						<PopularMovies />
+						<TopRatedMovies />
+						<TrendingMovies />
+						<UpcomingMovies />
+					</MovieSearch>
 				</main>
 			</div>
 
