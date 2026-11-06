@@ -10,6 +10,7 @@ The project showcases modern frontend architecture, server-side rendering, effic
 
 - **Movie Discovery:** Browse popular, trending, top-rated, and upcoming movies, with detailed information, ratings, and cast.
 - **AI Movie Assistant:** Ask questions about movies and receive contextual recommendations powered by Gemini and MCP tools.
+- **Voice Input:** Record English or Spanish speech, review the transcript, and send it through the existing assistant.
 - **Structured AI Responses:** Display conversational responses alongside interactive movie cards.
 - **Personal Watchlist:** Add and remove movies using Zustand-managed local state.
 - **Infinite Scrolling:** Load paginated movie collections efficiently using TanStack Query.
@@ -106,6 +107,18 @@ The assistant uses an **MCP-first architecture**, allowing Gemini to retrieve mo
 Responses are validated with **Zod** and enriched with TMDB movie data before rendering. This separates AI-generated recommendations from application-controlled movie metadata.
 
 Communication between the AI route and MCP server uses authenticated HTTP, while Gemini and TMDB credentials remain server-side.
+
+### Voice Input
+
+Tap the microphone in the assistant, allow microphone access, then tap Stop to transcribe. The text is appended to the draft for review; it is never sent to chat automatically. Cancel discards the recording or ignores a pending transcription. Recordings stop after one minute and are limited to 2 MiB.
+
+Microphone recording requires HTTPS or localhost and a browser with MediaRecorder support. The server sends audio to Gemini using the existing `GOOGLE_API_KEY` or `GEMINI_API_KEY`. Optionally set the server-only `GEMINI_TRANSCRIPTION_MODEL` to an audio-capable Gemini model; the default is `gemini-3.5-flash-lite`. Transcription uses the provider API and may incur usage charges. The application does not persist audio.
+
+Run the mocked transcription tests with Node 24:
+
+```sh
+node --test src/features/assistant/services/transcription.server.test.mjs
+```
 
 ## ⚡ Performance
 
