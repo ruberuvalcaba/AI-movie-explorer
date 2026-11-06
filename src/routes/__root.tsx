@@ -52,7 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body>
 				{children}
 				{/* ───────────────── MENU ───────────────── */}
-				<div className="fixed w-full flex z-50 top-0 justify-end px-12 py-5 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
+				<div className="fixed w-full flex z-50 top-0 justify-end px-4 py-5 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<IconButton
 						title="My watchlist"
 						icon={Bookmark}

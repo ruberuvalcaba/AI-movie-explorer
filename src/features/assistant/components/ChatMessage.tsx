@@ -12,7 +12,7 @@ export const ChatMessage = ({ interaction, content }: ChatMessageProps) => {
 		<div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
 			<div
 				className={`
-					max-w-[85%]
+					min-w-0 max-w-[95%] break-words [overflow-wrap:anywhere] sm:max-w-[85%]
 					rounded-2xl
 					px-4
 					py-3

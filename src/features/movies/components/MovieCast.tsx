@@ -22,9 +22,9 @@ export function MovieCast({ cast, isLoading }: MovieCastProps) {
 	}
 
 	return (
-		<section className="mt-16">
+		<section className="mt-10 min-w-0 sm:mt-16">
 			{/* Section header */}
-			<div className="mb-6 flex items-end justify-between border-b border-white/10 pb-4">
+			<div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-white/10 pb-4">
 				<div>
 					<p className="mb-2 text-xs font-medium uppercase tracking-[0.25em] text-white/40">
 						The Ensemble
@@ -41,11 +41,11 @@ export function MovieCast({ cast, isLoading }: MovieCastProps) {
 			</div>
 
 			{/* Cast rail */}
-			<div className="flex gap-5 overflow-x-auto pb-6 scrollbar-none">
+			<div className="flex gap-3 overflow-x-auto sm:gap-5 pb-6 scrollbar-none">
 				{cast.map((member) => (
 					<article
 						key={member.id}
-						className="group w-[150px] shrink-0 md:w-[170px]"
+						className="group w-[120px] shrink-0 sm:w-[150px] md:w-[170px]"
 					>
 						{/* Portrait */}
 						<div className="relative aspect-[3/4] overflow-hidden rounded-[12px] bg-white/5">

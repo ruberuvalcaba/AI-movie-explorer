@@ -24,7 +24,7 @@ export const MovieAssistant = () => {
 	return (
 		<>
 			{isOpen ? (
-				<div className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[380px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#111116]/90 shadow-2xl backdrop-blur-xl">
+				<div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-3 z-50 flex h-[min(500px,calc(100dvh-6rem))] w-[calc(100%-1.5rem)] sm:bottom-6 sm:right-6 sm:w-[380px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#111116]/90 shadow-2xl backdrop-blur-xl">
 					<div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
 						<div>
 							<h2 className="text-sm font-semibold text-white">
@@ -38,13 +38,13 @@ export const MovieAssistant = () => {
 							type="button"
 							onClick={() => setIsOpen(false)}
 							aria-label="Collapse AI Movie Assistant"
-							className="flex cursor-pointer h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+							className="flex cursor-pointer h-11 w-11 shrink-0 sm:h-8 sm:w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white"
 						>
 							<ChevronDown size={18} />
 						</button>
 					</div>
 
-					<div className="flex-1 space-y-3 overflow-y-auto p-4">
+					<div className="min-h-0 min-w-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain p-4">
 						{messages.map((message) => {
 							const isUser = message.role === "user";
 
@@ -111,7 +111,7 @@ export const MovieAssistant = () => {
 					type="button"
 					onClick={() => setIsOpen(true)}
 					aria-label="Open AI Movie Assistant"
-					className="group cursor-pointer fixed bottom-6 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/[0.08] text-white shadow-[0_0_40px_rgba(168,85,247,0.25)] backdrop-blur-2xl transition-all duration-500 hover:scale-110 hover:border-white/30 hover:bg-white/[0.12] hover:shadow-[0_0_55px_rgba(168,85,247,0.4)]"
+					className="group cursor-pointer fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/[0.08] text-white shadow-[0_0_40px_rgba(168,85,247,0.25)] backdrop-blur-2xl transition-all duration-500 hover:scale-110 hover:border-white/30 hover:bg-white/[0.12] hover:shadow-[0_0_55px_rgba(168,85,247,0.4)]"
 				>
 					{/* Outer ambient glow */}
 					<span className="absolute inset-[-8px] -z-10 rounded-full bg-purple-400/20 blur-xl transition-all duration-500 group-hover:bg-purple-400/30" />

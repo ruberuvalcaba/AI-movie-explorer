@@ -23,7 +23,7 @@ export function MyWatchlist() {
 	}
 
 	return (
-		<main className="mx-auto max-w-7xl my-20">
+		<main className="mx-auto my-20 max-w-7xl px-4 pb-20 sm:px-6">
 			<div className="flex items-center">
 				<IconButton title="Close" icon={ChevronLeft} />
 				<MovieSectionHeader title="My Watchlist" count={movies?.length} />
@@ -31,7 +31,7 @@ export function MyWatchlist() {
 			{!movieIds.length ? (
 				<p>Your watchlist is empty.</p>
 			) : (
-				<div className="grid grid-cols-2 gap-10 md:grid-cols-5">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
 					{movies.map((movie) =>
 						movie ? <MovieCard key={movie.id} movie={movie} /> : null,
 					)}

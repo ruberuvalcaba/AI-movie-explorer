@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MovieCard } from "@/components/MovieCard";
 import { Spinner } from "@/components/ui/spinner";
 import type { Movie } from "@/types/movie";
@@ -12,8 +12,6 @@ interface MovieContainerProps {
 }
 const CARD_WIDTH = 250;
 const GAP = 20;
-const ITEM_SIZE = CARD_WIDTH + GAP;
-const CARD_HEIGHT = 375;
 
 export const MovieContainer = ({
 	movies = [],
@@ -23,6 +21,28 @@ export const MovieContainer = ({
 }: MovieContainerProps) => {
 	// const loadMoreRef = useRef<HTMLDivElement>(null); //If using infinit srolling with IntersectionObserver
 	const scrollRef = useRef<HTMLDivElement>(null);
+	const [cardWidth, setCardWidth] = useState(CARD_WIDTH);
+	const cardHeight = cardWidth * 1.5;
+	const gap = cardWidth < CARD_WIDTH ? 12 : GAP;
+	const itemSize = cardWidth + gap;
+
+	useEffect(() => {
+		const element = scrollRef.current;
+		if (!element) return;
+
+		const updateCardWidth = () => {
+			// Match the watchlist's two-column mobile layout and 12px gap.
+			setCardWidth(
+				window.innerWidth < 640
+					? Math.min(CARD_WIDTH, (element.clientWidth - 8 - 12) / 2)
+					: CARD_WIDTH,
+			);
+		};
+		const observer = new ResizeObserver(updateCardWidth);
+		observer.observe(element);
+		updateCardWidth();
+		return () => observer.disconnect();
+	}, []);
 
 	/* Infinit right scrolling with IntersectionObserver */
 	/*
@@ -51,10 +71,15 @@ export const MovieContainer = ({
 		count: movies.length,
 		getScrollElement: () => scrollRef.current,
 		horizontal: true,
-		estimateSize: () => ITEM_SIZE,
+		estimateSize: () => itemSize,
 		overscan: 5, //This means TanStack Virtual renders the items visible in the viewport + approximately 5 additional items on each side.
 		getItemKey: (index) => movies[index]?.id ?? index,
 	});
+
+	useEffect(() => {
+		// Discard cached positions when responsive card dimensions change.
+		if (itemSize > 0) virtualizer.measure();
+	}, [itemSize, virtualizer]);
 
 	const virtualItems = virtualizer.getVirtualItems();
 	const lastVirtualItemIndex = virtualItems[virtualItems.length - 1]?.index;
@@ -88,7 +113,7 @@ export const MovieContainer = ({
 					className="relative shrink-0"
 					style={{
 						width: virtualizer.getTotalSize(),
-						height: CARD_HEIGHT,
+						height: cardHeight,
 					}}
 				>
 					{virtualItems.map((virtualItem) => {
@@ -100,8 +125,8 @@ export const MovieContainer = ({
 								className="absolute top-0 snap-start"
 								style={{
 									left: virtualItem.start,
-									width: CARD_WIDTH,
-									height: CARD_HEIGHT,
+									width: cardWidth,
+									height: cardHeight,
 								}}
 							>
 								<MovieCard movie={movie} />

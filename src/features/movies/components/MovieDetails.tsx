@@ -63,7 +63,7 @@ export const MovieDetails = () => {
 	if (error) return <p>Failed to load movies: {error.message}</p>;
 
 	return (
-		<div className="fixed inset-0 z-50 overflow-y-auto bg-[#050507] text-white">
+		<div className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-[#050507] text-white">
 			{/* Backdrop */}
 			<div className="fixed inset-0">
 				<img
@@ -81,10 +81,10 @@ export const MovieDetails = () => {
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 mx-auto min-h-screen max-w-[1400px] items-end px-6 pb-16 pt-32">
+			<div className="relative z-10 mx-auto min-h-dvh max-w-[1400px] items-end px-4 pb-24 pt-24 sm:px-6 sm:pb-16 sm:pt-32">
 				<IconButton title="Close" icon={ChevronLeft} />
 				<div className="mx-auto flex items-end sm:px-10">
-					<div className="grid w-full gap-8 lg:grid-cols-[260px_1fr]">
+					<div className="grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[260px_1fr]">
 						{/* Poster */}
 						<div className="hidden overflow-hidden rounded-[12px] border border-white/15 shadow-2xl lg:block">
 							<img
@@ -95,7 +95,7 @@ export const MovieDetails = () => {
 						</div>
 
 						{/* Details */}
-						<div className="max-w-3xl">
+						<div className="min-w-0 max-w-3xl">
 							{/* Metadata */}
 							<div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
 								<span>{movie.release_date?.slice(0, 4)}</span>
@@ -116,7 +116,7 @@ export const MovieDetails = () => {
 							</div>
 
 							{/* Title */}
-							<h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+							<h1 className="break-words text-3xl font-bold tracking-tight sm:text-6xl">
 								{movie.title}
 							</h1>
 
@@ -133,7 +133,7 @@ export const MovieDetails = () => {
 							</p>
 
 							{/* Actions */}
-							<div className="mt-8 flex flex-wrap gap-3">
+							<div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
 								<MovieTrailer
 									key={movie.id}
 									movieTitle={movie.title}
@@ -184,7 +184,7 @@ export const MovieDetails = () => {
 							</div>
 
 							{/* Bottom info */}
-							<div className="mt-8 flex flex-wrap gap-3">
+							<div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
 								<PillContainer
 									label={formatRuntime(movie.runtime ?? 0)}
 									icon={<Clock size={15} />}

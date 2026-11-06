@@ -29,13 +29,13 @@ export const MovieTrailer = ({ movieTitle, videos }: MovieTrailerProps) => {
 			{trailer && (
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm" />
-					<Dialog.Content className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-white/15 bg-[#111116] text-white shadow-2xl">
+					<Dialog.Content className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-5xl sm:w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-2xl border border-white/15 bg-[#111116] text-white shadow-2xl">
 						<div className="flex items-center justify-between gap-4 p-4">
-							<div>
-								<Dialog.Title className="text-lg font-semibold">
+							<div className="min-w-0">
+								<Dialog.Title className="break-words text-base font-semibold sm:text-lg">
 									{movieTitle} — Trailer
 								</Dialog.Title>
-								<Dialog.Description className="text-sm text-white/60">
+								<Dialog.Description className="break-words text-sm text-white/60">
 									{trailer.name}
 								</Dialog.Description>
 							</div>
@@ -43,7 +43,7 @@ export const MovieTrailer = ({ movieTitle, videos }: MovieTrailerProps) => {
 								<button
 									type="button"
 									aria-label="Close trailer"
-									className="cursor-pointer rounded-full p-2 hover:bg-white/10"
+									className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-white/10"
 								>
 									<X size={22} />
 								</button>

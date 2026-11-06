@@ -22,7 +22,7 @@ export const ChatInput = ({ onSubmit }: ChatInputProps) => {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="flex items-center gap-2 border-t border-white/10 p-3"
+			className="flex shrink-0 items-center gap-2 border-t border-white/10 p-3"
 		>
 			<input
 				value={message}
@@ -34,7 +34,7 @@ export const ChatInput = ({ onSubmit }: ChatInputProps) => {
 					bg-transparent
 					px-2
 					py-2
-					text-sm
+					text-base sm:text-sm
 					text-white
 					outline-none
 					placeholder:text-white/40
@@ -46,8 +46,8 @@ export const ChatInput = ({ onSubmit }: ChatInputProps) => {
 				disabled={!message.trim()}
 				className="
 					flex
-					h-9
-					w-9
+					h-11 sm:h-9
+					w-11 sm:w-9
 					shrink-0
 					items-center
 					justify-center

@@ -6,7 +6,7 @@ export const HomeButton = () => {
 		<Link
 			to="/"
 			aria-label="Go to home page"
-			className="fixed top-3 left-12 flex rounded-full backdrop-blur-xl transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70"
+			className="fixed top-3 left-4 sm:left-12 flex rounded-full backdrop-blur-xl transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70"
 		>
 			<span className="relative block h-14 w-14">
 				{/* Ambient glow */}
