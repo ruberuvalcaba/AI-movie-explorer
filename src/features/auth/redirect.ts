@@ -15,7 +15,7 @@ function isLocalPath(value: string) {
 
 // Validate decoded forms too: encoded slashes/backslashes must not turn a path
 // into a protocol-relative URL when it is decoded or normalized by a browser.
-export function getSafeRedirect(value: unknown, fallback = "/profile"): string {
+export function getSafeRedirect(value: unknown, fallback = "/"): string {
 	if (typeof value !== "string" || value.length > 2048 || !isLocalPath(value))
 		return fallback;
 	try {

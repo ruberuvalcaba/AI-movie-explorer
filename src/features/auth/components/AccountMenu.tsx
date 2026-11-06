@@ -1,14 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { clearPrivateCache } from "@/integrations/tanstack-query/private-cache";
 import { Route } from "@/routes/__root";
 import { signOut } from "../api/auth.functions";
+import { getSafeRedirect } from "../redirect";
 
 export function AccountMenu() {
 	const { auth } = Route.useRouteContext();
 	const router = useRouter();
+	const currentPage = useLocation({ select: (location) => location.href });
 	const queryClient = useQueryClient();
 	useEffect(() => {
 		if (!auth.configured) return;
@@ -35,14 +37,19 @@ export function AccountMenu() {
 	const [error, setError] = useState("");
 	if (!auth.user)
 		return (
-			<Link to="/login" className="shrink-0 text-sm text-white">
+			<Link
+				to="/login"
+				search={{ redirect: getSafeRedirect(currentPage) }}
+				className="shrink-0 text-sm text-white"
+			>
 				Sign in
 			</Link>
 		);
+	const accountLabel = auth.user.displayName || auth.user.email;
 	return (
 		<div className="flex shrink-0 items-center gap-3 text-sm text-white">
-			<Link to="/profile" className="max-w-32 truncate" title={auth.user.email}>
-				{auth.user.email}
+			<Link to="/profile" className="max-w-32 truncate" title={accountLabel}>
+				{accountLabel}
 			</Link>
 			<button
 				type="button"

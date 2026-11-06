@@ -225,10 +225,13 @@ try {
  for (const next of ['https://other.example/steal', '//other.example/steal', '/\\other.example/steal', '/%2f%2fother.example/steal', '/%5cother.example/steal', '/%0d%0aLocation:https://other.example', '/%6cogin', '/%2572egister', '/auth%2fconfirm']) {
   const response = await confirm(next);
   assert.equal(response.status, 303);
-  assert.equal(response.headers.get('location'), '/profile', `Reject unsafe confirmation redirect ${JSON.stringify(next)}`);
+  assert.equal(response.headers.get('location'), '/', `Reject unsafe confirmation redirect ${JSON.stringify(next)}`);
  }
- const nestedRedirect = await confirm('/movie/278?from=confirmation');
- assert.equal(nestedRedirect.headers.get('location'), '/movie/278?from=confirmation', 'Safe app redirects preserve query strings');
+ const defaultConfirmation = await fetch(`${base}/auth/confirm?token_hash=valid-confirmation-${++confirmationIndex}`, { redirect: 'manual' });
+ assert.equal(defaultConfirmation.status, 303);
+ assert.equal(defaultConfirmation.headers.get('location'), '/', 'Confirmation without a destination returns Home');
+ const nestedRedirect = await confirm('/movie/278?from=confirmation#saved');
+ assert.equal(nestedRedirect.headers.get('location'), '/movie/278?from=confirmation#saved', 'Safe app redirects preserve query strings and fragments');
  for (const suffix of ['', '?token_hash=expired-token', '?token_hash=valid-confirmation-recovery&type=recovery']) {
   const response = await fetch(`${base}/auth/confirm${suffix}`, { redirect: 'manual' });
   assert.equal(response.status, 303);
@@ -250,6 +253,40 @@ try {
  const cookie = cookieJar(login); assert.match(cookie, /auth-token/);
  assert.match(login.headers.get('cache-control'), /no-store/);
  assert.ok(login.headers.getSetCookie().every(value => /Secure/i.test(value) && /SameSite=Lax/i.test(value)));
+ const headerProfileLink = html => {
+  const anchor = html.match(/<a\b(?=[^>]*\bhref="\/profile")[^>]*>[\s\S]*?<\/a>/);
+  assert.ok(anchor, 'Header contains an authenticated profile link');
+  return anchor[0];
+ };
+ const assertHeaderLabel = (html, label) => {
+  const anchor = headerProfileLink(html);
+  assert.ok(anchor.includes(`>${label}</a>`), `Header uses ${JSON.stringify(label)} as its account label`);
+  assert.ok(anchor.includes(`title="${label}"`), 'Header tooltip uses the same account label');
+  if (label !== user.email) assert.ok(!anchor.includes(user.email), 'Header does not reveal email when a display name exists');
+ };
+ const defaultLoginReturn = await fetch(`${base}/login`, { headers: { Cookie: cookie }, redirect: 'manual' });
+ assert.equal(defaultLoginReturn.status, 307);
+ assert.equal(defaultLoginReturn.headers.get('location'), '/', 'Already signed-in login route defaults to Home');
+ for (const destination of ['/movie/278?from=search#saved', '/?q=space', '/watchlist']) {
+  const response = await fetch(`${base}/login?redirect=${encodeURIComponent(destination)}`, { headers: { Cookie: cookie }, redirect: 'manual' });
+  assert.equal(response.status, 307);
+  assert.equal(response.headers.get('location'), destination, 'Sign-in preserves an explicit safe return destination');
+ }
+ const unsafeLoginReturn = await fetch(`${base}/login?redirect=${encodeURIComponent('https://other.example/steal')}`, { headers: { Cookie: cookie }, redirect: 'manual' });
+ assert.equal(unsafeLoginReturn.status, 307);
+ const normalizedReturn = new URL(unsafeLoginReturn.headers.get('location'), base);
+ assert.equal(normalizedReturn.origin, base, 'Unsafe return destinations never leave this origin');
+ if (normalizedReturn.pathname === '/login') {
+  // TanStack first canonicalizes validated search parameters, before beforeLoad.
+  assert.equal(normalizedReturn.searchParams.get('redirect'), '/');
+  const homeReturn = await fetch(normalizedReturn, { headers: { Cookie: cookie }, redirect: 'manual' });
+  assert.equal(homeReturn.status, 307);
+  assert.equal(homeReturn.headers.get('location'), '/', 'Normalized unsafe return destination lands on Home');
+ } else assert.equal(unsafeLoginReturn.headers.get('location'), '/', 'Unsafe sign-in destinations fall back to Home');
+ const initialAuth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
+ assert.equal(initialAuth.user.id, user.id);
+ assert.equal(initialAuth.user.displayName, '');
+ assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
  const cookieName = cookie.slice(0, cookie.indexOf('='));
  const oldSession = { ...session(), expires_at: Math.floor(Date.now() / 1000) - 60 };
  const expiredCookie = `${cookieName}=base64-${Buffer.from(JSON.stringify(oldSession)).toString('base64url')}`;
@@ -264,6 +301,8 @@ try {
  const update = await decode(await rpc('updateProfile', { method: 'POST', cookie, data: { displayName: '  Movie Fan  ', id: otherUser.id, userId: otherUser.id } }));
  assert.equal(update.result.error, null);
  assert.equal(update.result.profile.displayName, 'Movie Fan');
+ const namedAuth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
+ assert.equal(namedAuth.user.displayName, 'Movie Fan', 'Auth context loads the editable database display name');
  const saved = await db.query('select id,display_name from public.profiles order by id');
  assert.equal(saved.rows.find(row => row.id === user.id).display_name, 'Movie Fan');
  assert.equal(saved.rows.find(row => row.id === otherUser.id).display_name, 'Other User', 'Submitted identity cannot edit another profile');
@@ -284,10 +323,24 @@ try {
  const profileHtml = await profile.text();
  assert.ok(profileHtml.includes(user.email));
  assert.ok(profileHtml.includes('Movie Fan'));
+ assertHeaderLabel(profileHtml, 'Movie Fan');
  assert.match(profile.headers.get('cache-control'), /no-store/);
  // Separate documents with the same cookie model refresh and session restoration.
  const refreshed = await fetch(`${base}/profile`, { headers: { Cookie: cookie } });
  assert.equal(refreshed.status, 200); assert.ok((await refreshed.text()).includes('Movie Fan'));
+ // Profile names are optional presentation data: blank names or unavailable
+ // profile storage must not invalidate an otherwise verified Auth session.
+ await db.query('update public.profiles set display_name=$1 where id=$2', ['  Movie Fan  ', user.id]);
+ assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), 'Movie Fan');
+ await db.query('update public.profiles set display_name=$1 where id=$2', ['   ', user.id]);
+ assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
+ profileFailure = true;
+ const degradedAuth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
+ assert.equal(degradedAuth.user.id, user.id, 'A profile read failure must not sign the user out');
+ assert.equal(degradedAuth.user.email, user.email);
+ assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
+ profileFailure = false;
+ await db.query('update public.profiles set display_name=$1 where id=$2', ['Movie Fan', user.id]);
  const otherLogin = await rpc('signIn', { method: 'POST', data: { email: otherUser.email, password: 'password123' } });
  const otherCookie = cookieJar(otherLogin);
  const [ownAccount, anotherAccount, anonymousAccount] = await Promise.all([rpc('getAccount', { cookie }), rpc('getAccount', { cookie: otherCookie }), rpc('getAccount')]);
@@ -387,7 +440,7 @@ try {
  assert.equal((await rpc('updateProfile', { method: 'POST', cookie, data: { displayName: 'After logout' } })).status, 401, 'Revoked sessions cannot update profiles');
  assert.equal((await rpc('getSavedMovies', { cookie })).status, 401, 'Revoked sessions cannot access saved movies');
  assert.equal((await rpc('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 999 } })).status, 401, 'Revoked sessions cannot save movies');
- console.log('PASS: registration with/without confirmation, safe token/PKCE callbacks, login/logout, SSR refresh/renewal, editable profiles, implicit saved movies, empty signup, duplicate handling, no management interfaces, input validation, account isolation, CSRF and protected operations (mock Auth + real local PostgreSQL).');
+ console.log('PASS: Home/previous-page auth redirects, display-name header with email fallback, registration with/without confirmation, safe token/PKCE callbacks, login/logout, SSR refresh/renewal, editable profiles, implicit saved movies, empty signup, duplicate handling, no management interfaces, input validation, account isolation, CSRF and protected operations (mock Auth + real local PostgreSQL).');
 } finally {
  child.kill();
  await new Promise(resolve => mock.close(resolve));

@@ -201,17 +201,20 @@ Movie data provided by [TMDB](https://www.themoviedb.org/). This product uses th
 
 Authentication uses `@supabase/ssr` cookie sessions, a reusable browser client,
 and a fresh server client per request. The server verifies users with `getUser()`;
-only ID/email are exposed to router context. The header reflects this state.
+only verified ID/email and the profile display name are exposed to router context.
+The header shows the display name, falling back to email when no name is available.
 Movie browsing remains public. `/profile`, `/watchlist`, account reads, and
 watchlist operations require a verified session. Each account has one implicit,
 unnamed watchlist represented by its `saved_movies` rows. New accounts start empty,
 without creating a list record. No former Zustand/demo data is imported.
 Login/logout use document navigation to discard account-specific client state.
-Other tabs and focus changes invalidate authentication context.
+Other tabs and focus changes invalidate authentication context. The header sign-in
+link remembers the current in-app URL, including search and hash, and returns
+there after login; direct login without a return URL goes to Home.
 The profile page loads `public.profiles` and lets the authenticated user edit their
 display name (1–100 characters after trimming). Profile reads and updates verify
 identity with `getUser()` and constrain the row by that verified ID, with database
-RLS as an additional check. The header continues to show the verified email.
+RLS as an additional check.
 
 ### Supabase configuration
 
@@ -241,13 +244,13 @@ RLS as an additional check. The header continues to show the verified email.
 
    Signup supplies `RedirectTo` as the current app origin's `/auth/confirm?next=...`.
    The server verifies the one-time token, writes session cookies, and returns to
-   the sanitized in-app destination (default `/profile`). The callback also accepts
+   the sanitized in-app destination (default Home, `/`). The callback also accepts
    a PKCE `code` when the browser has its verifier cookie. It rejects external or
    encoded external return URLs. Invalid/expired links return to the login screen
    with a useful error. If confirmation is disabled, signup signs in immediately.
    The UI requires at least eight password characters; configure the project's
    password policy accordingly. The former `SiteURL` template still confirms
-   email but always falls back to `/profile` instead of preserving the destination.
+   email but falls back to Home instead of preserving the destination.
 5. Configure production SMTP and Auth rate limits in Supabase before launch.
 
 Registration/login remain available independently of profile reads. Editable
@@ -271,7 +274,7 @@ these responses with shared CDN caching rules.
 ```sh
 npx tsc --noEmit
 npm run build
-node scripts/test-auth.mjs
+npm run test:auth
 ```
 
 The HTTP smoke test launches the built production app and a **mock** Supabase Auth
@@ -284,12 +287,12 @@ Run it after building; local listening ports are required.
 
 To verify the configured Supabase project manually:
 
-- Register, follow the confirmation email, and verify the account email in the header.
+- Register, follow the confirmation email, and verify your display name in the header (or email until you set a name).
 - Sign out, then sign in with email/password; refresh `/profile` and navigate between pages.
 - Edit your display name, save, and refresh: the saved name must remain. Verify blank
   or oversized names are rejected and a second account cannot read/update your profile.
 - Test `/login?redirect=/` and registration with a return destination; login and
-  confirmation should return there. External destinations must fall back to `/profile`.
+  confirmation should return there. External destinations must fall back to Home (`/`).
 - Open `/profile` and `/watchlist` in an anonymous window: both must redirect to login.
 - Sign out and verify account data disappears; try an expired/invalid confirmation link.
 - Verify sign-out in another tab updates the header when the original tab regains focus.

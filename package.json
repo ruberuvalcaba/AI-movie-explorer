@@ -13,7 +13,7 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "test:auth": "node scripts/test-auth.mjs",
+    "test:auth": "node --test scripts/auth-redirect.test.mjs && node scripts/test-auth.mjs",
     "test:db": "node scripts/database.mjs",
     "db:types": "node scripts/database.mjs --types && biome format --write src/integrations/supabase/database.types.ts",
     "test:cache": "node --test scripts/private-cache.test.mjs"

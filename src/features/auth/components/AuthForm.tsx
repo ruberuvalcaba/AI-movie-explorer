@@ -7,7 +7,7 @@ import { credentialsSchema, registrationSchema } from "../schemas";
 
 export function AuthForm({
 	register = false,
-	redirectTo = "/profile",
+	redirectTo = "/",
 	confirmationFailed = false,
 }: {
 	register?: boolean;

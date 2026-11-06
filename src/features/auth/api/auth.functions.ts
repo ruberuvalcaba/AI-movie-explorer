@@ -1,6 +1,7 @@
 import type { AuthError } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { readProfile } from "@/features/profiles/services.server";
 import {
 	getSupabaseServerClient,
 	isAuthConfigured,
@@ -33,12 +34,16 @@ function authErrorMessage(error: AuthError, registering = false): string {
 export const getAuthStatus = createServerFn({ method: "GET" }).handler(
 	async () => {
 		if (!isAuthConfigured()) return { user: null, configured: false };
-		const { data, error } = await getSupabaseServerClient().auth.getUser();
+		const supabase = getSupabaseServerClient();
+		const { data, error } = await supabase.auth.getUser();
+		if (error || !data.user) return { user: null, configured: true };
+		const profile = await readProfile(supabase, data.user.id);
 		return {
-			user:
-				error || !data.user
-					? null
-					: { id: data.user.id, email: data.user.email ?? "" },
+			user: {
+				id: data.user.id,
+				email: data.user.email ?? "",
+				displayName: profile.displayName.trim(),
+			},
 			configured: true,
 		};
 	},
