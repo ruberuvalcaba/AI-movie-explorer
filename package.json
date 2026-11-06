@@ -12,11 +12,17 @@
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "test:auth": "node --test scripts/auth-redirect.test.mjs && node scripts/test-auth.mjs",
+    "test:db": "node scripts/database.mjs",
+    "db:types": "node scripts/database.mjs --types && biome format --write src/integrations/supabase/database.types.ts",
+    "test:cache": "node --test scripts/private-cache.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "^2.4.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/ai": "latest",
     "@tanstack/ai-client": "latest",
@@ -47,11 +53,11 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",
     "tw-animate-css": "^1.3.6",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.15"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
+    "@electric-sql/pglite": "^0.5.15",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-event-client": "latest",
