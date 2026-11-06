@@ -24,7 +24,7 @@ export const MovieAssistant = () => {
 	return (
 		<>
 			{isOpen ? (
-				<div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-3 z-50 flex h-[min(500px,calc(100dvh-6rem))] w-[calc(100%-1.5rem)] sm:bottom-6 sm:right-6 sm:w-[380px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#111116]/90 shadow-2xl backdrop-blur-xl">
+				<div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-3 z-50 flex h-[min(500px,calc(100dvh-6rem))] w-[calc(100%-1.5rem)] sm:bottom-6 sm:right-6 sm:w-[380px] flex-col overflow-hidden rounded-2xl border border-purple-300/25 bg-[#140d20]/95 bg-[radial-gradient(ellipse_at_top_left,rgba(168,85,247,0.22),transparent_65%),radial-gradient(ellipse_at_bottom_right,rgba(124,58,237,0.16),transparent_60%)] shadow-[0_0_45px_rgba(168,85,247,0.22),0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
 					<div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
 						<div>
 							<h2 className="text-sm font-semibold text-white">
