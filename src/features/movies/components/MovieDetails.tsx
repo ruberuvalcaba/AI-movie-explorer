@@ -1,15 +1,14 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { Check, ChevronLeft, Clock, Plus, Star } from "lucide-react";
+import { ChevronLeft, Clock, Star } from "lucide-react";
 import { IconButton } from "#/components/IconButton";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
 import { formatRuntime } from "../../../utils";
-import { useToggleWatchlist } from "../mutations";
 import { movieCreditsQuery, movieDetailsQuery } from "../queries";
-import { useWatchlistStore } from "../store/watchlistStore.store";
 import { MovieCast } from "./MovieCast";
 import { MovieTrailer } from "./MovieTrailer";
+import { SaveMovieToWatchlist } from "./SaveMovieToWatchlist";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
@@ -49,15 +48,6 @@ export const MovieDetails = () => {
 	});
 	const cast = creditsQuery.data?.cast ?? [];
 	*/
-	const isInWatchlist = useWatchlistStore((state) =>
-		movie ? state.hasMovie(movie.id) : false,
-	);
-	const toggleWatchlist = useToggleWatchlist(movie?.id);
-	const isAdding =
-		toggleWatchlist.isPending && toggleWatchlist.variables === "add";
-
-	const isRemoving =
-		toggleWatchlist.isPending && toggleWatchlist.variables === "remove";
 
 	if (isPending) return <MovieSpinner />;
 	if (error) return <p>Failed to load movies: {error.message}</p>;
@@ -140,47 +130,7 @@ export const MovieDetails = () => {
 									videos={movie.videos?.results ?? []}
 								/>
 
-								<button
-									type="button"
-									className="
-									flex items-center gap-2
-									rounded-full
-									border border-white/15
-									bg-white/10
-									px-6 py-3
-									text-sm font-medium
-									text-white
-									backdrop-blur-xl
-									transition
-									hover:bg-white/15
-									cursor-pointer
-								"
-									disabled={toggleWatchlist.isPending}
-									onClick={() =>
-										toggleWatchlist.mutate(isInWatchlist ? "remove" : "add")
-									}
-								>
-									{isAdding ? (
-										"Adding..."
-									) : isRemoving ? (
-										"Removing..."
-									) : isInWatchlist ? (
-										<>
-											<Check size={18} />
-											In Watchlist
-										</>
-									) : (
-										<>
-											<Plus size={18} />
-											Add to Watchlist
-										</>
-									)}
-								</button>
-								{toggleWatchlist.isError && (
-									<p className="text-xs text-red-400 self-center">
-										Failed to update watchlist. Try again.
-									</p>
-								)}
+								<SaveMovieToWatchlist movieId={movie.id} />
 							</div>
 
 							{/* Bottom info */}

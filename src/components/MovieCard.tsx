@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { memo } from "react";
+import { SaveMovieToWatchlist } from "@/features/movies/components/SaveMovieToWatchlist";
 import { usePrefetchMovie } from "@/features/movies/hooks/usePrefetchMovie";
 import type { MiniMovie, Movie } from "@/types/movie";
 
@@ -22,84 +23,94 @@ export const MovieCard = memo((props: Props) => {
 	const { onMouseEnter, onMouseLeave } = usePrefetchMovie(movie.id);
 
 	return (
-		<Link
-			to="/movie/$movieId"
-			params={{ movieId: String(movie.id) }}
-			onMouseEnter={onMouseEnter}
-			onMouseLeave={onMouseLeave}
+		<div
+			className={
+				isMini ? "relative w-[120px] shrink-0" : "relative w-full min-w-0"
+			}
 		>
-			<div
-				className={
-					isMini
-						? "group relative aspect-[2/3] w-[120px] shrink-0 overflow-hidden rounded-lg bg-zinc-900 shadow-lg"
-						: "group relative aspect-[2/3] w-full min-w-0 overflow-hidden rounded-[12px] bg-zinc-900 shadow-xl"
-				}
+			<Link
+				to="/movie/$movieId"
+				params={{ movieId: String(movie.id) }}
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
+				className="block"
 			>
-				{/* Background */}
-				<img
-					src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
-					alt={movie.title}
-					className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-					loading="lazy"
-					decoding="async"
-				/>
+				<div
+					className={
+						isMini
+							? "group relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-zinc-900 shadow-lg"
+							: "group relative aspect-[2/3] w-full overflow-hidden rounded-[12px] bg-zinc-900 shadow-xl"
+					}
+				>
+					{/* Background */}
+					<img
+						src={`${TMDB_IMAGE_BASE_URL}${movie.poster_path}`}
+						alt={movie.title}
+						className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+						loading="lazy"
+						decoding="async"
+					/>
 
-				{/* Cinematic overlay */}
-				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5 transition-opacity duration-300 group-hover:opacity-0" />
+					{/* Cinematic overlay */}
+					<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5 transition-opacity duration-300 group-hover:opacity-0" />
 
-				{/* Glass content */}
-				<div className="absolute inset-x-0 bottom-0">
-					<div
-						className={
-							isMini
-								? "relative min-h-[65px] rounded-b-lg border-x border-b border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur-xl"
-								: "relative flex min-h-[100px] sm:min-h-[120px] flex-col rounded-b-[12px] border-x border-b border-white/15 bg-white/10 p-3 shadow-2xl backdrop-blur-xl"
-						}
-					>
-						{/* Title */}
-						<h3
-							className={
-								isMini
-									? "mb-1 truncate text-xs font-bold tracking-tight text-white"
-									: "mb-2 break-words text-sm sm:text-lg font-bold tracking-tight text-white"
-							}
-						>
-							{movie.title}
-						</h3>
-
+					{/* Glass content */}
+					<div className="absolute inset-x-0 bottom-0">
 						<div
 							className={
 								isMini
-									? "flex items-center justify-between"
-									: "mt-auto flex items-center justify-between"
+									? "relative min-h-[65px] rounded-b-lg border-x border-b border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur-xl"
+									: "relative flex min-h-[100px] sm:min-h-[120px] flex-col rounded-b-[12px] border-x border-b border-white/15 bg-white/10 p-3 shadow-2xl backdrop-blur-xl"
 							}
 						>
-							{/* Rating */}
-							<div
+							{/* Title */}
+							<h3
 								className={
 									isMini
-										? "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-md"
-										: "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-2 py-1.5 text-xs sm:gap-1.5 sm:px-3 font-medium text-white backdrop-blur-md"
+										? "mb-1 truncate text-xs font-bold tracking-tight text-white"
+										: "mb-2 break-words text-sm sm:text-lg font-bold tracking-tight text-white"
 								}
 							>
-								<span className="text-yellow-400">★</span>
-								<span>{movie.vote_average.toFixed(1)}</span>
-							</div>
+								{movie.title}
+							</h3>
 
-							{/* Year */}
 							<div
 								className={
 									isMini
-										? "rounded-full border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/80 backdrop-blur-md"
-										: "rounded-full border border-white/15 bg-white/10 px-2 py-1.5 text-xs sm:px-3 font-medium text-white/80 backdrop-blur-md"
+										? "flex items-center justify-between"
+										: "mt-auto flex items-center justify-between"
 								}
 							>
-								{movie.release_date?.slice(0, 4)}
+								{/* Rating */}
+								<div
+									className={
+										isMini
+											? "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-md"
+											: "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-2 py-1.5 text-xs sm:gap-1.5 sm:px-3 font-medium text-white backdrop-blur-md"
+									}
+								>
+									<span className="text-yellow-400">★</span>
+									<span>{movie.vote_average.toFixed(1)}</span>
+								</div>
+
+								{/* Year */}
+								<div
+									className={
+										isMini
+											? "rounded-full border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/80 backdrop-blur-md"
+											: "rounded-full border border-white/15 bg-white/10 px-2 py-1.5 text-xs sm:px-3 font-medium text-white/80 backdrop-blur-md"
+									}
+								>
+									{movie.release_date?.slice(0, 4)}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+			</Link>
+			<div className="absolute right-2 top-2 z-10">
+				<SaveMovieToWatchlist movieId={movie.id} title={movie.title} compact />
 			</div>
-		</Link>
+		</div>
 	);
 });

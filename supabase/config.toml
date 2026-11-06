@@ -1,0 +1,12 @@
+project_id = "ai-movie-explorer"
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.seed]
+enabled = false
+
+[auth]
+site_url = "http://localhost:3000"

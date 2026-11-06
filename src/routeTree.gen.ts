@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiRouteImport } from './routes/ai'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as MovieMovieIdRouteImport } from './routes/movie/$movieId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -25,14 +29,34 @@ const AiRoute = AiRouteImport.update({
   path: '/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
   path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/auth/confirm',
+  path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieMovieIdRoute = MovieMovieIdRouteImport.update({
@@ -44,38 +68,82 @@ const MovieMovieIdRoute = MovieMovieIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/watchlist': typeof WatchlistRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/watchlist': typeof WatchlistRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/watchlist': typeof WatchlistRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ai' | '/mcp' | '/watchlist' | '/movie/$movieId'
+  fullPaths:
+    | '/'
+    | '/ai'
+    | '/login'
+    | '/mcp'
+    | '/profile'
+    | '/register'
+    | '/watchlist'
+    | '/auth/confirm'
+    | '/movie/$movieId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai' | '/mcp' | '/watchlist' | '/movie/$movieId'
-  id: '__root__' | '/' | '/ai' | '/mcp' | '/watchlist' | '/movie/$movieId'
+  to:
+    | '/'
+    | '/ai'
+    | '/login'
+    | '/mcp'
+    | '/profile'
+    | '/register'
+    | '/watchlist'
+    | '/auth/confirm'
+    | '/movie/$movieId'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai'
+    | '/login'
+    | '/mcp'
+    | '/profile'
+    | '/register'
+    | '/watchlist'
+    | '/auth/confirm'
+    | '/movie/$movieId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiRoute: typeof AiRoute
+  LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
   WatchlistRoute: typeof WatchlistRoute
+  AuthConfirmRoute: typeof AuthConfirmRoute
   MovieMovieIdRoute: typeof MovieMovieIdRoute
 }
 
@@ -95,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -102,11 +177,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watchlist': {
       id: '/watchlist'
       path: '/watchlist'
       fullPath: '/watchlist'
       preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/confirm': {
+      id: '/auth/confirm'
+      path: '/auth/confirm'
+      fullPath: '/auth/confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$movieId': {
@@ -122,8 +218,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiRoute: AiRoute,
+  LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
   WatchlistRoute: WatchlistRoute,
+  AuthConfirmRoute: AuthConfirmRoute,
   MovieMovieIdRoute: MovieMovieIdRoute,
 }
 export const routeTree = rootRouteImport

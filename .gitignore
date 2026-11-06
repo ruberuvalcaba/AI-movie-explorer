@@ -12,3 +12,5 @@ dist-ssr
 __unconfig*
 todos.json
 mcp-todos.json
+supabase/.temp/
+supabase/.branches/

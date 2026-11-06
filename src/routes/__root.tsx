@@ -1,5 +1,5 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import type { QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useQuery } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
@@ -9,17 +9,26 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Bookmark } from "lucide-react";
 import { IconButton } from "#/components/IconButton";
 import { MovieSearchBar } from "#/features/movies/components/MovieSearchBar";
-import { useWatchlistStore } from "#/features/movies/store/watchlistStore.store";
 import { HomeButton } from "@/components/HomeButton";
 import { MovieAssistant } from "@/features/assistant/components/MovieAssistant";
+import { getAuthStatus } from "@/features/auth/api/auth.functions";
+import { AccountMenu } from "@/features/auth/components/AccountMenu";
+import { savedMoviesQuery } from "@/features/movies/watchlist.queries";
+import { clearPrivateCache } from "@/integrations/tanstack-query/private-cache";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
+	auth: Awaited<ReturnType<typeof getAuthStatus>>;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+	beforeLoad: async ({ context }) => {
+		const auth = await getAuthStatus();
+		await clearPrivateCache(context.queryClient, auth.user?.id);
+		return { auth };
+	},
 	head: () => ({
 		meta: [
 			{
@@ -44,6 +53,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const { auth } = Route.useRouteContext();
+	const savedMovies = useQuery(savedMoviesQuery(auth.user?.id));
 	return (
 		<html lang="en">
 			<head>
@@ -56,11 +67,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<div className="fixed w-full flex items-center gap-2 z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<HomeButton />
 					<MovieSearchBar />
+					<AccountMenu />
 					<div className="shrink-0">
 						<IconButton
 							title="My watchlist"
 							icon={Bookmark}
-							count={useWatchlistStore((state) => state.movieIds.length)}
+							count={auth.user ? savedMovies.data?.length : undefined}
 							route="/watchlist"
 						/>
 					</div>
