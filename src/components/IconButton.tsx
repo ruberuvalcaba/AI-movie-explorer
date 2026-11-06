@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 
 type IconButtonProps = {
@@ -6,6 +6,7 @@ type IconButtonProps = {
 	count?: number | string;
 	icon: LucideIcon;
 	route?: string;
+	goBack?: boolean;
 	type?: "button" | "submit" | "reset";
 };
 
@@ -14,14 +15,22 @@ export const IconButton = ({
 	icon: Icon,
 	count,
 	route,
+	goBack = false,
 	type = "button",
 }: IconButtonProps) => {
 	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<button
 			type={type}
-			onClick={route ? () => navigate({ to: route }) : undefined}
+			onClick={
+				goBack
+					? () => router.history.back()
+					: route
+						? () => navigate({ to: route })
+						: undefined
+			}
 			aria-label={`${title}${count ? `, ${count} items` : ""}`}
 			title={title}
 			className="cursor-pointer group relative flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white"

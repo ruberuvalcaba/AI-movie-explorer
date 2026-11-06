@@ -82,7 +82,7 @@ export const MovieDetails = () => {
 
 			{/* Content */}
 			<div className="relative z-10 mx-auto min-h-dvh max-w-[1400px] items-end px-4 pb-24 pt-24 sm:px-6 sm:pb-16 sm:pt-32">
-				<IconButton title="Close" icon={ChevronLeft} route="/" />
+				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<div className="mx-auto flex items-end sm:px-10">
 					<div className="grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[260px_1fr]">
 						{/* Poster */}
