@@ -9,7 +9,7 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 
 export const MovieAssistant = () => {
-	const [isOpen, setIsOpen] = useState(true);
+	const [isOpen, setIsOpen] = useState(false);
 	const location = useLocation();
 	const movieId = location.pathname.match(/^\/movie\/(\d+)$/)?.[1];
 

@@ -67,7 +67,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<div className="fixed w-full flex items-center gap-2 z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<HomeButton />
 					<MovieSearchBar />
-					<AccountMenu />
 					<div className="shrink-0">
 						<IconButton
 							title="My watchlist"
@@ -76,6 +75,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							route="/watchlist"
 						/>
 					</div>
+					<AccountMenu />
 				</div>
 				{/* AI */}
 				<MovieAssistant />
