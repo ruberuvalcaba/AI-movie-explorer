@@ -35,6 +35,7 @@ export const TrendingMovies = () => {
 			<MovieSectionHeader
 				title="Trending Movies"
 				count={`${movies?.length}+`}
+				displayArrow={true}
 			/>
 			<MovieContainer
 				movies={movies}

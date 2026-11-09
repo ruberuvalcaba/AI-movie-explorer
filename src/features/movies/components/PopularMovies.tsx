@@ -32,7 +32,11 @@ export const PopularMovies = () => {
 
 	return (
 		<section>
-			<MovieSectionHeader title="Popular Movies" count={`${movies?.length}+`} />
+			<MovieSectionHeader
+				title="Popular Movies"
+				count={`${movies?.length}+`}
+				displayArrow={true}
+			/>
 			<MovieContainer
 				movies={movies}
 				fetchNextPage={fetchNextPage}

@@ -35,6 +35,7 @@ export const TopRatedMovies = () => {
 			<MovieSectionHeader
 				title="Top Rated Movies"
 				count={`${movies?.length}+`}
+				displayArrow={true}
 			/>
 			<MovieContainer
 				movies={movies}

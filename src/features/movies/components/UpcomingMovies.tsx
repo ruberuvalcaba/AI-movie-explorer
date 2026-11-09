@@ -35,6 +35,7 @@ export const UpcomingMovies = () => {
 			<MovieSectionHeader
 				title="Upcoming Movies"
 				count={`${movies?.length}+`}
+				displayArrow={true}
 			/>
 			<MovieContainer
 				movies={movies}
