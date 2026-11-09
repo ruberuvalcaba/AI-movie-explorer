@@ -130,3 +130,32 @@ body::before {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
+
+/* Shared hover treatment for actions, including links styled as buttons. */
+@layer base {
+  :where(button, [role="button"], .action-button) {
+    transition: box-shadow 180ms ease, border-color 180ms ease,
+      background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+}
+
+@media (hover: hover) {
+  :is(button, [role="button"], .action-button):not(:disabled):not([aria-disabled="true"]):not([data-disabled]):hover {
+    border-color: rgba(192, 132, 252, 0.65);
+    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.3),
+      0 0 20px rgba(168, 85, 247, 0.35),
+      inset 0 0 12px rgba(168, 85, 247, 0.1);
+  }
+}
+
+:is(button, [role="button"], .action-button):not(:disabled):not([aria-disabled="true"]):not([data-disabled]):focus-visible {
+  border-color: rgba(192, 132, 252, 0.65);
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.3),
+    0 0 20px rgba(168, 85, 247, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(button, [role="button"], .action-button) {
+    transition: none;
+  }
+}

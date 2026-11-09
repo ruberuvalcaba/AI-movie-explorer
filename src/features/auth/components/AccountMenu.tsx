@@ -42,7 +42,7 @@ export function AccountMenu() {
 			<Link
 				to="/login"
 				search={{ redirect: getSafeRedirect(currentPage) }}
-				className="shrink-0 text-sm text-white"
+				className="action-button rounded-full px-3 py-2 shrink-0 text-sm text-white"
 			>
 				Sign in
 			</Link>

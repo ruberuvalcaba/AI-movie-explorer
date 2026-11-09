@@ -1,12 +1,6 @@
 import { useIsMutating, useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import {
-	Bookmark,
-	BookmarkCheck,
-	CircleAlert,
-	Heart,
-	LoaderCircle,
-} from "lucide-react";
+import { Bookmark, CircleAlert, Heart, LoaderCircle } from "lucide-react";
 import { Route as RootRoute } from "@/routes/__root";
 import { useAddSavedMovie, useRemoveSavedMovie } from "../mutations";
 import { savedMovieKeys, savedMoviesQuery } from "../watchlist.queries";
@@ -20,9 +14,9 @@ type Props = {
 };
 
 const actionClass =
-	"flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50";
+	"action-button flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50";
 const compactClass =
-	"flex cursor-pointer h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60";
+	"action-button flex cursor-pointer h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60";
 
 export function SaveMovieToCollection({
 	movieId,
@@ -93,9 +87,7 @@ function MovieCollectionControl({
 				? "Removing…"
 				: adding
 					? "Saving…"
-					: saved
-						? `Remove from ${category}`
-						: `Add to ${category}`;
+					: "";
 	const Icon =
 		movies.isPending || busy
 			? LoaderCircle
@@ -103,9 +95,7 @@ function MovieCollectionControl({
 				? CircleAlert
 				: category === "favorites"
 					? Heart
-					: saved
-						? BookmarkCheck
-						: Bookmark;
+					: Bookmark;
 	return (
 		<div className={compact ? "relative" : "space-y-2"}>
 			<button
@@ -136,7 +126,7 @@ function MovieCollectionControl({
 					className={
 						movies.isPending || busy
 							? "animate-spin"
-							: saved && category === "favorites"
+							: saved
 								? "fill-yellow-400 text-yellow-300"
 								: undefined
 					}
