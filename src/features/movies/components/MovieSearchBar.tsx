@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
+import { House, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { searchMoviesQuery } from "../queries";
 import { registerSuggestionDismissal } from "../search-suggestions.events";
@@ -9,6 +9,7 @@ import { MovieSearchSuggestions } from "./MovieSearchSuggestions";
 export const MovieSearchBar = () => {
 	const navigate = useNavigate();
 	const formRef = useRef<HTMLFormElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 	const search = useSearch({ strict: false });
 	const query = search.q ?? "";
 	const [input, setInput] = useState(query);
@@ -57,6 +58,7 @@ export const MovieSearchBar = () => {
 			<div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-white/20 bg-black/20 px-2 sm:px-4 focus-within:ring-2 focus-within:ring-purple-400">
 				<input
 					id="movie-search"
+					ref={inputRef}
 					type="search"
 					value={input}
 					onChange={(event) => {
@@ -72,6 +74,22 @@ export const MovieSearchBar = () => {
 					placeholder="Search movies..."
 					className="min-w-0 w-full bg-transparent py-3 text-base text-white outline-none placeholder:text-white/50"
 				/>
+				{input.length > 0 && (
+					<button
+						type="button"
+						aria-label="Clear search text"
+						title="Clear text only"
+						onClick={() => {
+							setInput("");
+							setSuggestionQuery("");
+							inputRef.current?.focus();
+							setSuggestionsOpen(false);
+						}}
+						className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white/60 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+					>
+						<X size={18} aria-hidden="true" />
+					</button>
+				)}
 				<button
 					type="submit"
 					aria-label="Search movies"
@@ -83,14 +101,16 @@ export const MovieSearchBar = () => {
 				{query && (
 					<button
 						type="button"
+						aria-label="Clear search and return home"
+						title="Clear search and return home"
 						onClick={() => {
 							setInput("");
 							setSuggestionsOpen(false);
 							void navigate({ to: "/", search: {} });
 						}}
-						className="cursor-pointer"
+						className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white/60 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
 					>
-						<X size={20} aria-hidden="true" />
+						<House size={20} aria-hidden="true" />
 					</button>
 				)}
 			</div>
