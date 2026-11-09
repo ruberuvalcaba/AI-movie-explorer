@@ -1,7 +1,5 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
-import { IconButton } from "#/components/IconButton";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
 import { MovieCard } from "@/components/MovieCard";
 import { Route as RootRoute } from "@/routes/__root";
@@ -52,7 +50,6 @@ function SavedMoviesPage({
 	return (
 		<main className="mx-auto mb-20 mt-36 sm:mt-20 max-w-7xl px-4 pb-20 text-white sm:px-6">
 			<div className="flex items-center">
-				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<MovieSectionHeader
 					title={category === "favorites" ? "My Favorites" : "My Watchlist"}
 					count={movies.data?.length ?? 0}

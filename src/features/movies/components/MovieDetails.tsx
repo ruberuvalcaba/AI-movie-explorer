@@ -1,7 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { ChevronLeft, Clock, Star } from "lucide-react";
-import { IconButton } from "#/components/IconButton";
+import { Clock, Star } from "lucide-react";
 import { MovieSpinner } from "#/components/MovieSpinner";
 import { PillContainer } from "#/components/PillContainer";
 import { formatRuntime } from "../../../utils";
@@ -74,7 +73,6 @@ export const MovieDetails = () => {
 
 			{/* Content */}
 			<div className="relative z-10 mx-auto min-h-dvh max-w-[1400px] items-end px-4 pb-24 pt-[30svh] sm:px-6 sm:pb-16 sm:pt-[34svh]">
-				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<div className="mx-auto flex items-end sm:px-10">
 					<div className="grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[260px_1fr]">
 						{/* Poster */}

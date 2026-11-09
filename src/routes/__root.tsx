@@ -4,9 +4,11 @@ import {
 	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
+	useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Bookmark, Heart } from "lucide-react";
+import { BackButton } from "#/components/BackButton";
 import { IconButton } from "#/components/IconButton";
 import { MovieSearchBar } from "#/features/movies/components/MovieSearchBar";
 import { HomeButton } from "@/components/HomeButton";
@@ -54,6 +56,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { auth } = Route.useRouteContext();
+	const pathname = useLocation({ select: (location) => location.pathname });
+	const showBackButton =
+		pathname.startsWith("/movie/") ||
+		pathname === "/favorites" ||
+		pathname === "/watchlist";
 	const savedMovies = useQuery(savedMoviesQuery(auth.user?.id));
 	const favorites = useQuery(savedMoviesQuery(auth.user?.id, "favorites"));
 	return (
@@ -67,8 +74,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{/* ───────────────── MENU ───────────────── */}
 				<div className="fixed w-full grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 sm:flex z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<HomeButton />
-					<div className="col-span-full row-start-2 min-w-0 sm:flex-1">
-						<MovieSearchBar />
+					<div className="col-span-full row-start-2 flex min-w-0 items-center gap-2 sm:flex-1 sm:gap-4">
+						{showBackButton && <BackButton />}
+						<div className="min-w-0 flex-1">
+							<MovieSearchBar />
+						</div>
 					</div>
 					<div className="shrink-0">
 						<IconButton
