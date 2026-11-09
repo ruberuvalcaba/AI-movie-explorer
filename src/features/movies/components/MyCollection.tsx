@@ -17,7 +17,7 @@ export function MyCollection({ category }: { category: MovieCollection }) {
 	const { auth } = RootRoute.useRouteContext();
 	if (!auth.user)
 		return (
-			<main className="mx-auto mt-28 max-w-7xl px-4 text-white">
+			<main className="mx-auto mt-36 sm:mt-28 max-w-7xl px-4 text-white">
 				<Link
 					to="/login"
 					search={{ redirect: `/${category}` }}
@@ -50,7 +50,7 @@ function SavedMoviesPage({
 		),
 	});
 	return (
-		<main className="mx-auto my-20 max-w-7xl px-4 pb-20 text-white sm:px-6">
+		<main className="mx-auto mb-20 mt-36 sm:mt-20 max-w-7xl px-4 pb-20 text-white sm:px-6">
 			<div className="flex items-center">
 				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<MovieSectionHeader

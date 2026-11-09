@@ -47,7 +47,7 @@ export function ProfileForm({
 			),
 	});
 	return (
-		<main className="mx-auto mt-28 max-w-lg px-4 pb-12">
+		<main className="mx-auto mt-36 sm:mt-28 max-w-lg px-4 pb-12">
 			<form
 				className="space-y-5 rounded-xl border border-white/15 bg-white/5 p-6 text-white"
 				onSubmit={(event) => {

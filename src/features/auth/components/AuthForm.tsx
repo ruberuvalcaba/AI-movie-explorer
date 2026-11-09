@@ -20,7 +20,7 @@ export function AuthForm({
 	const [pending, setPending] = useState(false);
 	const [message, setMessage] = useState("");
 	return (
-		<main className="mx-auto mt-28 max-w-md px-4">
+		<main className="mx-auto mt-36 sm:mt-28 max-w-md px-4">
 			<form
 				className="space-y-5 rounded-xl border border-white/15 bg-white/5 p-6 text-white"
 				onSubmit={async (event) => {

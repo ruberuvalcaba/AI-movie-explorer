@@ -65,9 +65,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body>
 				{children}
 				{/* ───────────────── MENU ───────────────── */}
-				<div className="fixed w-full flex items-center gap-2 z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
+				<div className="fixed w-full grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 sm:flex z-50 top-0 px-2 py-3 sm:gap-4 sm:px-12 border-b border-white/10 backdrop-blur-xl transition-colors shadow-lg">
 					<HomeButton />
-					<MovieSearchBar />
+					<div className="col-span-full row-start-2 min-w-0 sm:flex-1">
+						<MovieSearchBar />
+					</div>
 					<div className="shrink-0">
 						<IconButton
 							title="My watchlist"

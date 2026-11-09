@@ -7,7 +7,7 @@ export const HomePage = () => {
 	return (
 		<div className="relative h-dvh overflow-hidden bg-[#141414] text-white">
 			{/* ───────────────── TV SCREEN / CONTENT ───────────────── */}
-			<div className="absolute inset-2 top-20 overflow-x-hidden overflow-y-auto bg-[#222222] rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px]">
+			<div className="absolute inset-2 top-36 overflow-x-hidden overflow-y-auto bg-[#222222] rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px]">
 				<main className="mx-auto mb-8 min-w-0 max-w-full rounded-2xl sm:rounded-[35px]">
 					<MovieSearch>
 						<PopularMovies />
@@ -19,7 +19,7 @@ export const HomePage = () => {
 			</div>
 
 			{/* ───────────────── CINEMATIC TV FRAME ───────────────── */}
-			<div className="pointer-events-none fixed inset-2 top-20 z-10 overflow-hidden rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px] border border-white/15 opacity-[0.15]">
+			<div className="pointer-events-none fixed inset-2 top-36 z-10 overflow-hidden rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px] border border-white/15 opacity-[0.15]">
 				<svg
 					aria-hidden="true"
 					className="absolute inset-0 h-full w-full rounded-[35px]"
