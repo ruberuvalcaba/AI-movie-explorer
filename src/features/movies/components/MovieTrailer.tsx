@@ -29,7 +29,7 @@ export const MovieTrailer = ({ movieTitle, videos }: MovieTrailerProps) => {
 			{trailer && (
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm" />
-					<Dialog.Content className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-5xl sm:w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-2xl border border-white/15 bg-[#111116] text-white shadow-2xl">
+					<Dialog.Content className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-5xl sm:w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-2xl bg-[#111116] text-white shadow-2xl">
 						<div className="flex items-center justify-between gap-4 p-4">
 							<div className="min-w-0">
 								<Dialog.Title className="break-words text-base font-semibold sm:text-lg">
