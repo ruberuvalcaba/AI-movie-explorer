@@ -97,8 +97,8 @@ export const MovieCard = memo((props: Props) => {
 								<div
 									className={
 										isMini
-											? "rounded-full border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/80 backdrop-blur-md"
-											: "rounded-full border border-white/15 bg-white/10 px-2 py-1.5 text-xs sm:px-3 font-medium text-white/80 backdrop-blur-md"
+											? "rounded-full border border-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white/80"
+											: "rounded-full border border-white/15 px-2 py-1.5 text-xs sm:px-3 font-medium text-white/80"
 									}
 								>
 									{movie.release_date?.slice(0, 4)}
