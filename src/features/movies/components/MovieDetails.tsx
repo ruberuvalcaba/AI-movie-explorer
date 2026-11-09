@@ -56,24 +56,24 @@ export const MovieDetails = () => {
 
 	return (
 		<div className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-[#050507] text-white">
-			{/* Backdrop */}
-			<div className="fixed inset-0">
-				<img
-					src={`${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`}
-					alt=""
-					className="h-full w-full object-cover"
-				/>
-
-				{/* Dark cinematic treatment */}
-				<div className="absolute inset-0 bg-black/60" />
-
-				<div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/50 to-[#050507]" />
-
-				<div className="absolute inset-0 bg-gradient-to-r from-[#050507]/90 via-transparent to-[#050507]/40" />
+			{/* Backdrop fades into the scrolling content background. */}
+			<div
+				className="pointer-events-none absolute inset-x-0 top-0 h-[85svh] min-h-[560px] max-h-[960px] overflow-hidden"
+				aria-hidden="true"
+			>
+				{movie.backdrop_path && (
+					<img
+						src={`${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`}
+						alt=""
+						className="h-full w-full object-cover"
+					/>
+				)}
+				<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,5,7,0.1)_0%,rgba(5,5,7,0.35)_25%,rgba(5,5,7,0.88)_70%,#050507_65%)]" />
+				<div className="absolute inset-0 bg-gradient-to-r from-[#050507]/90 via-[#050507]/20 to-[#050507]/10" />
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 mx-auto min-h-dvh max-w-[1400px] items-end px-4 pb-24 pt-24 sm:px-6 sm:pb-16 sm:pt-32">
+			<div className="relative z-10 mx-auto min-h-dvh max-w-[1400px] items-end px-4 pb-24 pt-[30svh] sm:px-6 sm:pb-16 sm:pt-[34svh]">
 				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<div className="mx-auto flex items-end sm:px-10">
 					<div className="grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[260px_1fr]">
