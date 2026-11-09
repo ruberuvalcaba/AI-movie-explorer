@@ -23,7 +23,7 @@ export const MovieContainer = ({
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [cardWidth, setCardWidth] = useState(CARD_WIDTH);
 	const cardHeight = cardWidth * 1.5;
-	const gap = cardWidth < CARD_WIDTH ? 12 : GAP;
+	const gap = cardWidth < CARD_WIDTH ? 8 : GAP;
 	const itemSize = cardWidth + gap;
 
 	useEffect(() => {
@@ -31,10 +31,10 @@ export const MovieContainer = ({
 		if (!element) return;
 
 		const updateCardWidth = () => {
-			// Match the watchlist's two-column mobile layout and 12px gap.
+			// Fit three cards, two 8px gaps, and the scroll container padding on mobile.
 			setCardWidth(
 				window.innerWidth < 640
-					? Math.min(CARD_WIDTH, (element.clientWidth - 8 - 12) / 2)
+					? Math.min(CARD_WIDTH, (element.clientWidth - 8 - 16) / 3)
 					: CARD_WIDTH,
 			);
 		};

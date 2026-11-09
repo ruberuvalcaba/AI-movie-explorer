@@ -60,7 +60,7 @@ export const MovieCard = memo((props: Props) => {
 							className={
 								isMini
 									? "relative min-h-[65px] rounded-b-lg border-x border-b border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur-xl"
-									: "relative flex min-h-[100px] sm:min-h-[120px] flex-col rounded-b-[12px] border-x border-b border-white/15 bg-white/10 p-3 shadow-2xl backdrop-blur-xl"
+									: "relative flex min-h-[72px] sm:min-h-[120px] flex-col rounded-b-[12px] border-x border-b border-white/15 bg-white/10 p-1.5 sm:p-3 shadow-2xl backdrop-blur-xl"
 							}
 						>
 							{/* Title */}
@@ -68,7 +68,7 @@ export const MovieCard = memo((props: Props) => {
 								className={
 									isMini
 										? "mb-1 truncate text-xs font-bold tracking-tight text-white"
-										: "mb-2 break-words text-sm sm:text-lg font-bold tracking-tight text-white"
+										: "mb-1 line-clamp-2 sm:line-clamp-none break-words text-[11px] sm:mb-2 sm:text-lg font-bold tracking-tight text-white"
 								}
 							>
 								{movie.title}
@@ -78,7 +78,7 @@ export const MovieCard = memo((props: Props) => {
 								className={
 									isMini
 										? "flex items-center justify-between"
-										: "mt-auto flex items-center justify-between"
+										: "mt-auto flex flex-wrap items-center justify-between gap-1"
 								}
 							>
 								{/* Rating */}
@@ -86,7 +86,7 @@ export const MovieCard = memo((props: Props) => {
 									className={
 										isMini
 											? "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-md"
-											: "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-2 py-1.5 text-xs sm:gap-1.5 sm:px-3 font-medium text-white backdrop-blur-md"
+											: "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1 py-0.5 text-[10px] sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-xs font-medium text-white backdrop-blur-md"
 									}
 								>
 									<span className="text-yellow-400">★</span>
@@ -98,7 +98,7 @@ export const MovieCard = memo((props: Props) => {
 									className={
 										isMini
 											? "rounded-full border border-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white/80"
-											: "rounded-full border border-white/15 px-2 py-1.5 text-xs sm:px-3 font-medium text-white/80"
+											: "rounded-full border border-white/15 px-1 py-0.5 text-[10px] sm:px-3 sm:py-1.5 sm:text-xs font-medium text-white/80"
 									}
 								>
 									{movie.release_date?.slice(0, 4)}
@@ -108,7 +108,7 @@ export const MovieCard = memo((props: Props) => {
 					</div>
 				</div>
 			</Link>
-			<div className="absolute right-2 top-2 z-10 flex gap-2">
+			<div className="absolute right-1 top-1 z-10 flex gap-1 sm:right-2 sm:top-2 sm:gap-2">
 				<SaveMovieToCollection
 					category="watchlist"
 					movieId={movie.id}

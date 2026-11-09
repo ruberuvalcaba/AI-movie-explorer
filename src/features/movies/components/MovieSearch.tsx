@@ -45,7 +45,7 @@ export const MovieSearch = ({ children }: { children: ReactNode }) => {
 							<p>No movies found. Try another title.</p>
 						)}
 					</div>
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+					<div className="grid grid-cols-3 gap-2 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
 						{movies.map((movie) => (
 							<MovieCard key={movie.id} movie={movie} />
 						))}

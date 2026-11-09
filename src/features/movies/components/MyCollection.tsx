@@ -84,7 +84,7 @@ function SavedMoviesPage({
 				</div>
 			)}
 			{Boolean(movies.data?.length) && (
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+				<div className="grid grid-cols-3 gap-2 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
 					{movies.data?.map((entry, index) => {
 						const query = movieQueries[index];
 						return query?.data ? (
