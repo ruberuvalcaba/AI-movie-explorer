@@ -1,12 +1,14 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { searchMoviesQuery } from "../queries";
+import { registerSuggestionDismissal } from "../search-suggestions.events";
 import { MovieSearchSuggestions } from "./MovieSearchSuggestions";
 
 export const MovieSearchBar = () => {
 	const navigate = useNavigate();
+	const formRef = useRef<HTMLFormElement>(null);
 	const search = useSearch({ strict: false });
 	const query = search.q ?? "";
 	const [input, setInput] = useState(query);
@@ -22,22 +24,24 @@ export const MovieSearchBar = () => {
 		}, 300);
 		return () => window.clearTimeout(timeout);
 	}, [input]);
-	const { data, isFetching, isError } = useInfiniteQuery({
+	useEffect(() => {
+		if (!suggestionsOpen || !formRef.current) return;
+		return registerSuggestionDismissal(formRef.current, () => {
+			setSuggestionsOpen(false);
+		});
+	}, [suggestionsOpen]);
+	const { data, isPending, isError } = useInfiniteQuery({
 		...searchMoviesQuery(suggestionQuery),
 		enabled: suggestionsOpen && suggestionQuery.length > 0,
 	});
 	const movies = data?.pages[0]?.results.slice(0, 5) ?? [];
 	const showSuggestions = suggestionsOpen && input.trim().length > 0;
-	const waitingForSearch = input.trim() !== suggestionQuery || isFetching;
+	const waitingForSearch = input.trim() !== suggestionQuery || isPending;
 	return (
 		<form
 			aria-label="Search movies"
 			className="relative mx-auto flex min-w-0 max-w-2xl flex-1 gap-1 sm:gap-2"
-			onBlur={(event) => {
-				if (!event.currentTarget.contains(event.relatedTarget)) {
-					setSuggestionsOpen(false);
-				}
-			}}
+			ref={formRef}
 			onKeyDown={(event) => {
 				if (event.key === "Escape") setSuggestionsOpen(false);
 			}}
@@ -94,8 +98,12 @@ export const MovieSearchBar = () => {
 				<MovieSearchSuggestions
 					movies={movies}
 					isLoading={waitingForSearch}
-					isError={isError}
-					onSelect={() => setSuggestionsOpen(false)}
+					isError={isError && movies.length === 0}
+					onSelect={() => {
+						setSuggestionsOpen(false);
+						// Dismiss the mobile keyboard after a successful selection.
+						formRef.current?.querySelector("input")?.blur();
+					}}
 				/>
 			)}
 		</form>

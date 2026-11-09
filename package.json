@@ -16,7 +16,8 @@
     "test:auth": "node --test scripts/auth-redirect.test.mjs && node scripts/test-auth.mjs",
     "test:db": "node scripts/database.mjs",
     "db:types": "node scripts/database.mjs --types && biome format --write src/integrations/supabase/database.types.ts",
-    "test:cache": "node --test scripts/private-cache.test.mjs"
+    "test:cache": "node --test scripts/private-cache.test.mjs",
+    "test:search": "node --test scripts/search-suggestions.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "^2.4.0",

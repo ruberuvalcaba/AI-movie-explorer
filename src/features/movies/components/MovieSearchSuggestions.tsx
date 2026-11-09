@@ -16,7 +16,7 @@ export const MovieSearchSuggestions = ({
 }: MovieSearchSuggestionsProps) => (
 	<div
 		id="movie-search-suggestions"
-		className="absolute inset-x-0 top-full mt-2 overflow-hidden rounded-2xl border border-white/20 bg-zinc-950 text-white shadow-xl"
+		className="absolute inset-x-0 top-full z-10 mt-2 max-h-[min(28rem,50dvh)] touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-white/20 bg-zinc-950 text-white shadow-xl"
 	>
 		{isLoading ? (
 			<p aria-live="polite" className="px-4 py-3 text-sm text-white/60">
