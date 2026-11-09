@@ -33,13 +33,13 @@ export const MovieCard = memo((props: Props) => {
 				params={{ movieId: String(movie.id) }}
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
-				className="block"
+				className="group block rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
 			>
 				<div
 					className={
 						isMini
-							? "group relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-zinc-900 shadow-lg"
-							: "group relative aspect-[2/3] w-full overflow-hidden rounded-[12px] bg-zinc-900 shadow-xl"
+							? "group relative aspect-[2/3] w-full overflow-hidden rounded-lg border border-white/15 bg-zinc-900 shadow-lg transition-[border-color,box-shadow] duration-300 group-hover:border-purple-300/50 group-hover:shadow-[0_0_18px_rgba(168,85,247,0.15)] group-focus-visible:border-purple-300/50"
+							: "group relative aspect-[2/3] w-full overflow-hidden rounded-[12px] border border-white/15 bg-zinc-900 shadow-xl transition-[border-color,box-shadow] duration-300 group-hover:border-purple-300/50 group-hover:shadow-[0_0_18px_rgba(168,85,247,0.15)] group-focus-visible:border-purple-300/50"
 					}
 				>
 					{/* Background */}
@@ -50,61 +50,19 @@ export const MovieCard = memo((props: Props) => {
 						loading="lazy"
 						decoding="async"
 					/>
-
-					{/* Cinematic overlay */}
-					<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5 transition-opacity duration-300 group-hover:opacity-0" />
-
-					{/* Glass content */}
-					<div className="absolute inset-x-0 bottom-0">
-						<div
-							className={
-								isMini
-									? "relative min-h-[65px] rounded-b-lg border-x border-b border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur-xl"
-									: "relative flex min-h-[72px] sm:min-h-[120px] flex-col rounded-b-[12px] border-x border-b border-white/15 bg-white/10 p-1.5 sm:p-3 shadow-2xl backdrop-blur-xl"
-							}
-						>
-							{/* Title */}
-							<h3
-								className={
-									isMini
-										? "mb-1 truncate text-xs font-bold tracking-tight text-white"
-										: "mb-1 line-clamp-2 sm:line-clamp-none break-words text-[11px] sm:mb-2 sm:text-lg font-bold tracking-tight text-white"
-								}
-							>
-								{movie.title}
-							</h3>
-
-							<div
-								className={
-									isMini
-										? "flex items-center justify-between"
-										: "mt-auto flex flex-wrap items-center justify-between gap-1"
-								}
-							>
-								{/* Rating */}
-								<div
-									className={
-										isMini
-											? "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-md"
-											: "flex items-center gap-1 rounded-full border border-white/10 bg-black/25 px-1 py-0.5 text-[10px] sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-xs font-medium text-white backdrop-blur-md"
-									}
-								>
-									<span className="text-yellow-400">★</span>
-									<span>{movie.vote_average.toFixed(1)}</span>
-								</div>
-
-								{/* Year */}
-								<div
-									className={
-										isMini
-											? "rounded-full border border-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white/80"
-											: "rounded-full border border-white/15 px-1 py-0.5 text-[10px] sm:px-3 sm:py-1.5 sm:text-xs font-medium text-white/80"
-									}
-								>
-									{movie.release_date?.slice(0, 4)}
-								</div>
-							</div>
-						</div>
+					<div
+						aria-hidden="true"
+						className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/35 to-transparent"
+					/>
+					<div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 px-2 pb-2 pt-4 text-[10px] font-medium text-white/90 sm:px-3 sm:pb-3 sm:text-xs">
+						<span className="flex items-center gap-1">
+							<span aria-hidden="true" className="text-yellow-400">
+								★
+							</span>
+							<span className="sr-only">Rating: </span>
+							{movie.vote_average.toFixed(1)}
+						</span>
+						<span>{movie.release_date?.slice(0, 4)}</span>
 					</div>
 				</div>
 			</Link>
