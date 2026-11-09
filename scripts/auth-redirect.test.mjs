@@ -15,7 +15,7 @@ test('unsafe and auth-screen destinations fall back to Home without redirect loo
  for (const value of [
   'https://other.example/steal', '//other.example/steal', '/\\other.example/steal',
   '/%2f%2fother.example/steal', '/%5cother.example/steal', '/%0d%0aLocation:https://other.example',
-  '/login', '/register?redirect=/', '/auth/confirm', '/%6cogin', '/%2572egister', '/auth%2fconfirm',
+  '/login', '/forgot-password', '/reset-password', '/register?redirect=/', '/auth/confirm', '/%6cogin', '/%2572egister', '/auth%2fconfirm',
  ]) assert.equal(getSafeRedirect(value), '/', JSON.stringify(value));
  assert.equal(authSearch({ redirect: 'https://other.example' }).redirect, '/');
 });

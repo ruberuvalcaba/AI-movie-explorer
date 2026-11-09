@@ -103,6 +103,16 @@ export function AuthForm({
 						required
 					/>
 				</label>
+				{!register && (
+					<p className="text-sm text-white/70">
+						<Link
+							to="/forgot-password"
+							className="inline-flex min-h-11 items-center underline"
+						>
+							Forgot password?
+						</Link>
+					</p>
+				)}
 				{message && (
 					<output className="block text-sm text-amber-200" aria-live="polite">
 						{message}

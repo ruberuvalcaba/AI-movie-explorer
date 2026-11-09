@@ -22,6 +22,12 @@ let profileFailure = false;
 let watchlistFailure = false;
 let watchlistWrites = 0;
 let signupRequests = 0;
+let currentPassword = 'password123';
+let recoveryRequests = 0;
+let passwordUpdates = 0;
+let recoveryStatus = 200;
+let passwordUpdateError = null;
+let latestRecoveryRedirect = '';
 let profileWrites = 0;
 let latestRedirect = '';
 const usedConfirmations = new Set();
@@ -51,13 +57,14 @@ const mock = createServer(async (req, res) => {
   const token = req.headers.authorization?.replace(/^Bearer /, '') ?? '';
   const authenticated = userForToken(token);
   res.setHeader('Content-Type', 'application/json');
+  res.setHeader('X-Supabase-Api-Version', '2024-01-01');
   const send = (status, value) => { res.writeHead(status); res.end(JSON.stringify(value)); };
   if (url.pathname === '/auth/v1/token') {
    const grant = url.searchParams.get('grant_type');
    const current = input.email === otherUser.email || input.refresh_token === `test-refresh-${otherUser.id}` ? otherUser : user;
    if (grant === 'pkce') {
     if (input.auth_code !== 'valid-code' || !input.code_verifier) { send(400, { code: 'bad_code_verifier', message: 'Invalid code' }); return; }
-   } else if (input.password !== 'password123' && input.refresh_token !== `test-refresh-${current.id}`) {
+   } else if (input.password !== (current.id === user.id ? currentPassword : 'password123') && input.refresh_token !== `test-refresh-${current.id}`) {
     send(400, { code: 'invalid_credentials', message: 'Invalid credentials' }); return;
    }
    revoked.delete(current.id); send(200, session(current));
@@ -67,12 +74,23 @@ const mock = createServer(async (req, res) => {
    await db.query('insert into auth.users (id,email,raw_user_meta_data) values ($1,$2,$3) on conflict (id) do nothing', [user.id, user.email, JSON.stringify(input.data ?? {})]);
    if (confirmationRequired) send(200, { user, session: null });
    else { revoked.delete(user.id); send(200, session()); }
+  } else if (url.pathname === '/auth/v1/recover') {
+   recoveryRequests++;
+   latestRecoveryRedirect = url.searchParams.get('redirect_to') ?? '';
+   if (recoveryStatus !== 200) { send(recoveryStatus, { code: recoveryStatus === 429 ? 'over_email_send_rate_limit' : 'email_not_found', message: 'Provider detail must not reach the client' }); return; }
+   send(200, {});
   } else if (url.pathname === '/auth/v1/verify') {
-   if (!String(input.token_hash).startsWith('valid-confirmation-') || usedConfirmations.has(input.token_hash)) {
+   if (!String(input.token_hash).startsWith(input.type === 'recovery' ? 'valid-recovery-' : 'valid-confirmation-') || usedConfirmations.has(input.token_hash)) {
     send(400, { code: 'otp_expired', message: 'Token expired' }); return;
    }
    usedConfirmations.add(input.token_hash); revoked.delete(user.id); send(200, session());
   } else if (url.pathname === '/auth/v1/user' && authenticated && !revoked.has(authenticated.id)) {
+   if (req.method === 'PUT') {
+    passwordUpdates++;
+    assert.ok(Object.keys(input).every(key => ['password', 'code_challenge', 'code_challenge_method'].includes(key)), 'Password update sends only password and SDK PKCE fields, never caller-supplied identity');
+    if (passwordUpdateError) { send(422, { code: passwordUpdateError, message: 'Provider detail must not reach the client' }); return; }
+    currentPassword = input.password;
+   }
    send(200, authenticated);
   } else if (url.pathname === '/auth/v1/logout' && authenticated) {
    revoked.add(authenticated.id); res.writeHead(204); res.end();
@@ -177,7 +195,7 @@ try {
  const assets = 'node_modules/.nitro/vite/services/ssr/assets';
  const ids = {};
  for (const file of await readdir(assets)) {
-  if (!/^(auth.functions|account.functions|profile.functions|watchlist.functions)-/.test(file)) continue;
+  if (!/^(auth.functions|account.functions|profile.functions|watchlist.functions|recovery.functions)-/.test(file)) continue;
   const source = await readFile(`${assets}/${file}`, 'utf8');
   for (const match of source.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)) ids[match[2]] = match[1];
  }
@@ -199,7 +217,9 @@ try {
   assert.equal(response.status, 307, path);
   assert.equal(new URL(response.headers.get('location'), base).pathname, '/login');
  }
- assert.equal((await fetch(`${base}/login`)).status, 200, 'Login stays public');
+ const loginPage = await fetch(`${base}/login`);
+ assert.equal(loginPage.status, 200, 'Login stays public');
+ assert.ok((await loginPage.text()).includes('Forgot password?'), 'Login exposes email recovery');
  assert.equal((await rpc('getAccount')).status, 401);
  assert.equal((await rpc('updateProfile', { method: 'POST', data: { displayName: 'Anonymous' } })).status, 401);
  assert.equal((await rpc('getSavedMovies')).status, 401);
@@ -235,7 +255,7 @@ try {
  assert.equal(defaultConfirmation.headers.get('location'), '/', 'Confirmation without a destination returns Home');
  const nestedRedirect = await confirm('/movie/278?from=confirmation#saved');
  assert.equal(nestedRedirect.headers.get('location'), '/movie/278?from=confirmation#saved', 'Safe app redirects preserve query strings and fragments');
- for (const suffix of ['', '?token_hash=expired-token', '?token_hash=valid-confirmation-recovery&type=recovery']) {
+ for (const suffix of ['', '?token_hash=expired-token', '?token_hash=valid-confirmation-invalid&type=magiclink']) {
   const response = await fetch(`${base}/auth/confirm${suffix}`, { redirect: 'manual' });
   assert.equal(response.status, 303);
   const target = new URL(response.headers.get('location'), base);
@@ -462,6 +482,72 @@ try {
  assert.equal((await rpc('updateProfile', { method: 'POST', cookie, data: { displayName: 'After logout' } })).status, 401, 'Revoked sessions cannot update profiles');
  assert.equal((await rpc('getSavedMovies', { cookie })).status, 401, 'Revoked sessions cannot access saved movies');
  assert.equal((await rpc('addSavedMovie', { method: 'POST', cookie, data: { movieId: 999 } })).status, 401, 'Revoked sessions cannot save movies');
+ // Email recovery operates without an existing session, but password updates do not.
+ assert.equal((await fetch(`${base}/forgot-password`)).status, 200);
+ const protectedReset = await fetch(`${base}/reset-password`, { redirect: 'manual' });
+ assert.equal(protectedReset.status, 307);
+ assert.equal(new URL(protectedReset.headers.get('location'), base).pathname, '/forgot-password');
+ assert.equal((await rpc('resetPassword', { method: 'POST', data: { password: 'new-password123', confirmPassword: 'new-password123' } })).status, 401);
+ const recoveryStart = await rpc('requestPasswordRecovery', { method: 'POST', data: { email: user.email } });
+ assert.equal((await decode(recoveryStart)).result.error, null);
+ assert.match(recoveryStart.headers.get('cache-control'), /no-store/);
+ const recoveryCallback = new URL(latestRecoveryRedirect);
+ assert.equal(recoveryCallback.origin, base);
+ assert.equal(recoveryCallback.pathname, '/auth/confirm');
+ assert.equal(recoveryCallback.searchParams.get('type'), 'recovery');
+ const recoveryCookies = cookieJar(recoveryStart);
+ assert.match(recoveryCookies, /code-verifier/, 'PKCE verifier is stored for same-browser recovery');
+ assert.equal((await decode(await rpc('requestPasswordRecovery', { method: 'POST', data: { email: 'unknown@example.test' } }))).result.error, null, 'Unknown account has identical response');
+ recoveryStatus = 400;
+ assert.equal((await decode(await rpc('requestPasswordRecovery', { method: 'POST', data: { email: user.email } }))).result.error, null, 'Provider account errors do not disclose registration');
+ recoveryStatus = 429;
+ assert.match((await decode(await rpc('requestPasswordRecovery', { method: 'POST', data: { email: user.email } }))).result.error, /Too many requests/);
+ recoveryStatus = 503;
+ assert.match((await decode(await rpc('requestPasswordRecovery', { method: 'POST', data: { email: user.email } }))).result.error, /Unable to send/);
+ recoveryStatus = 200;
+ const requestsBeforeInvalid = recoveryRequests;
+ await denied('requestPasswordRecovery', { method: 'POST', data: { email: 'not-an-email' } });
+ assert.equal(recoveryRequests, requestsBeforeInvalid);
+ assert.equal((await rpc('requestPasswordRecovery', { method: 'POST', origin: 'https://other.example', data: { email: user.email } })).status, 403);
+ for (const suffix of ['token_hash=expired-token&type=recovery', 'code=invalid-code&type=recovery', 'error=access_denied&type=recovery', 'token_hash=valid-recovery-unused&code=valid-code&type=recovery']) {
+  const response = await fetch(`${base}/auth/confirm?${suffix}`, { redirect: 'manual' });
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get('location'), '/forgot-password?error=recovery_failed');
+ }
+ const pkceRecovery = await fetch(`${base}/auth/confirm?code=valid-code&type=recovery&next=https://other.example`, { headers: { Cookie: recoveryCookies }, redirect: 'manual' });
+ assert.equal(pkceRecovery.headers.get('location'), '/reset-password', 'PKCE recovery uses a fixed safe destination');
+ const recoveryLink = `${base}/auth/confirm?token_hash=valid-recovery-once&type=recovery&next=https://other.example`;
+ const verifiedRecovery = await fetch(recoveryLink, { redirect: 'manual' });
+ assert.equal(verifiedRecovery.status, 303);
+ assert.equal(verifiedRecovery.headers.get('location'), '/reset-password');
+ assert.equal(verifiedRecovery.headers.get('referrer-policy'), 'no-referrer');
+ const recoveredCookie = cookieJar(verifiedRecovery);
+ assert.match(recoveredCookie, /auth-token/, 'Email link establishes a session without an old password');
+ const reusedRecovery = await fetch(recoveryLink, { redirect: 'manual' });
+ assert.equal(reusedRecovery.headers.get('location'), '/forgot-password?error=recovery_failed', 'Recovery link is single-use');
+ const resetPage = await fetch(`${base}/reset-password`, { headers: { Cookie: recoveredCookie } });
+ assert.equal(resetPage.status, 200);
+ const resetHtml = await resetPage.text();
+ assert.ok(resetHtml.includes('Set a new password') && resetHtml.includes('Confirm new password'));
+ const writesBeforeInvalidPassword = passwordUpdates;
+ for (const data of [{ password: 'short', confirmPassword: 'short' }, { password: 'new-password123', confirmPassword: 'different' }, { password: 'x'.repeat(129), confirmPassword: 'x'.repeat(129) }]) {
+  await denied('resetPassword', { method: 'POST', cookie: recoveredCookie, data });
+ }
+ assert.equal(passwordUpdates, writesBeforeInvalidPassword, 'Invalid passwords never reach Supabase');
+ assert.equal((await rpc('resetPassword', { method: 'POST', cookie: recoveredCookie, origin: 'https://other.example', data: { password: 'new-password123', confirmPassword: 'new-password123' } })).status, 403);
+ passwordUpdateError = 'weak_password';
+ assert.match((await resultOf('resetPassword', { method: 'POST', cookie: recoveredCookie, data: { password: 'new-password123', confirmPassword: 'new-password123' } })).error, /stronger password/);
+ passwordUpdateError = 'same_password';
+ assert.match((await resultOf('resetPassword', { method: 'POST', cookie: recoveredCookie, data: { password: 'new-password123', confirmPassword: 'new-password123' } })).error, /different/);
+ passwordUpdateError = null;
+ assert.equal((await resultOf('resetPassword', { method: 'POST', cookie: recoveredCookie, data: { password: 'new-password123', confirmPassword: 'new-password123', userId: otherUser.id } })).error, null);
+ await rpc('signOut', { method: 'POST', cookie: recoveredCookie });
+ assert.ok((await decode(await rpc('signIn', { method: 'POST', data: { email: user.email, password: 'password123' } }))).result.error, 'Previous password no longer signs in');
+ const recoveredLogin = await rpc('signIn', { method: 'POST', data: { email: user.email, password: 'new-password123' } });
+ assert.equal((await decode(recoveredLogin)).result.error, null, 'New password signs in');
+ assert.deepEqual((await resultOf('getSavedMovies', { cookie: cookieJar(recoveredLogin) })).map(movie => movie.tmdb_movie_id), [550], 'Recovery preserves saved movies');
+ assert.equal((await resultOf('getSavedMovies', { cookie: cookieJar(recoveredLogin), data: { category: 'favorites' } })).length, 1, 'Recovery preserves Favorites');
+ console.log('PASS: Email recovery requests, enumeration-safe responses, rate limits, token/PKCE callbacks, expired/reused links, password validation, protected password updates, new-password login and collection preservation.');
  console.log('PASS: Home/previous-page auth redirects, account menu with display-name/email fallback, registration with/without confirmation, safe token/PKCE callbacks, login/logout, SSR refresh/renewal, editable profiles, independent Watchlist/Favorites, empty signup, duplicate handling, no management interfaces, input validation, account isolation, CSRF and protected operations (mock Auth + real local PostgreSQL).');
 } finally {
  child.kill();

@@ -8,8 +8,13 @@ export const Route = createFileRoute("/auth/confirm")({
 		handlers: {
 			GET: async ({ request }) => {
 				const params = new URL(request.url).searchParams;
-				const next = getSafeRedirect(params.get("next"));
-				const failure = `/login?${new URLSearchParams({ error: "confirmation_failed", redirect: next })}`;
+				const recovery = params.get("type") === "recovery";
+				const next = recovery
+					? "/reset-password"
+					: getSafeRedirect(params.get("next"));
+				const failure = recovery
+					? "/forgot-password?error=recovery_failed"
+					: `/login?${new URLSearchParams({ error: "confirmation_failed", redirect: next })}`;
 				const respond = (location: string) =>
 					new Response(null, {
 						status: 303,
@@ -26,7 +31,7 @@ export const Route = createFileRoute("/auth/confirm")({
 					.safeParse(params.get("token_hash"));
 				const code = z.string().min(1).max(2048).safeParse(params.get("code"));
 				const type = z
-					.enum(["email", "signup"])
+					.enum(["email", "signup", "recovery"])
 					.safeParse(params.get("type") ?? "email");
 				if (
 					params.has("error") ||

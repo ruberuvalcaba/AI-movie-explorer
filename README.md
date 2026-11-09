@@ -360,3 +360,32 @@ the saved status, refresh, and sign into the same account in another browser or
 device. Confirm a different account starts empty and can save the same movie
 independently. Remove a movie, refresh, and sign out to verify private saved data
 is gone. Movie discovery and the AI assistant keep using their existing services.
+
+### Email password recovery
+
+Login includes **Forgot password?** at `/forgot-password`. Users request an email,
+follow its link to `/auth/confirm`, and set a new password at `/reset-password`.
+Recovery requests use a generic response regardless of whether an account exists.
+Password updates require a verified Auth session and matching passwords of 8–128
+characters; Supabase also enforces its configured password policy. No movie data
+or database migrations are involved.
+
+For a hosted Supabase project, configure these settings before testing delivery:
+
+1. Set **Authentication → URL Configuration → Site URL** to the deployed app's
+   trusted origin. Allow the app's `/auth/confirm` callback in Redirect URLs (and
+   the localhost callback for development).
+2. In **Email Templates → Reset Password**, use the contents of
+   `supabase/templates/recovery.html`. Its token-hash link works when the email is
+   opened in another browser/device; it does not rely on a browser's PKCE cookie.
+   The callback also supports PKCE recovery codes for default-template flows,
+   which require the browser that requested the email.
+3. Configure production SMTP/email delivery and appropriate Supabase Auth rate
+   limits. The app uses Supabase's email rate limiting; it does not send mail itself.
+4. Test requesting a real email, completing recovery, signing in with the new
+   password, and expired/reused links. Requests have no effect on the existing
+   password until a new password is submitted successfully.
+
+Local Supabase uses the checked-in recovery template/configuration. Hosted
+settings are not updated by editing these files. `npm run test:auth` tests recovery
+with mock Auth endpoints; it does not send email or verify hosted deliverability.

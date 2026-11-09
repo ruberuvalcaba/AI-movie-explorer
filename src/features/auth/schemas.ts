@@ -15,3 +15,15 @@ export const registrationSchema = credentialsSchema.extend({
 		.max(128, "Password must contain at most 128 characters."),
 	redirect: z.string().max(2048).optional(),
 });
+
+export const recoveryEmailSchema = credentialsSchema.pick({ email: true });
+
+export const passwordResetSchema = z
+	.object({
+		password: registrationSchema.shape.password,
+		confirmPassword: z.string().max(128),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords do not match.",
+		path: ["confirmPassword"],
+	});

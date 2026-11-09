@@ -40,7 +40,9 @@ export function getSafeRedirect(value: unknown, fallback = "/"): string {
 		// Auth screens cannot be their own return destination.
 		if (
 			[url.pathname, decodedUrl.pathname].some((path) =>
-				/^\/(?:login|register|auth)(?:\/|$)/.test(path),
+				/^\/(?:login|register|forgot-password|reset-password|auth)(?:\/|$)/.test(
+					path,
+				),
 			)
 		)
 			return fallback;

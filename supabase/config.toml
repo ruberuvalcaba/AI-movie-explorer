@@ -10,3 +10,8 @@ enabled = false
 
 [auth]
 site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+
+[auth.email.template.recovery]
+subject = "Reset your AI Movie Explorer password"
+content_path = "./supabase/templates/recovery.html"

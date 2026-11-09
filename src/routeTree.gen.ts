@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as MovieMovieIdRouteImport } from './routes/movie/$movieId'
@@ -33,6 +35,11 @@ const AiRoute = AiRouteImport.update({
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -55,6 +62,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
   path: '/watchlist',
@@ -75,10 +87,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/favorites': typeof FavoritesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/watchlist': typeof WatchlistRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
@@ -87,10 +101,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/favorites': typeof FavoritesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/watchlist': typeof WatchlistRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
@@ -100,10 +116,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/favorites': typeof FavoritesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/watchlist': typeof WatchlistRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/movie/$movieId': typeof MovieMovieIdRoute
@@ -114,10 +132,12 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/favorites'
+    | '/forgot-password'
     | '/login'
     | '/mcp'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/watchlist'
     | '/auth/confirm'
     | '/movie/$movieId'
@@ -126,10 +146,12 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/favorites'
+    | '/forgot-password'
     | '/login'
     | '/mcp'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/watchlist'
     | '/auth/confirm'
     | '/movie/$movieId'
@@ -138,10 +160,12 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/favorites'
+    | '/forgot-password'
     | '/login'
     | '/mcp'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/watchlist'
     | '/auth/confirm'
     | '/movie/$movieId'
@@ -151,10 +175,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiRoute: typeof AiRoute
   FavoritesRoute: typeof FavoritesRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   WatchlistRoute: typeof WatchlistRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   MovieMovieIdRoute: typeof MovieMovieIdRoute
@@ -181,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -211,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watchlist': {
       id: '/watchlist'
       path: '/watchlist'
@@ -239,10 +279,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiRoute: AiRoute,
   FavoritesRoute: FavoritesRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   WatchlistRoute: WatchlistRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   MovieMovieIdRoute: MovieMovieIdRoute,
