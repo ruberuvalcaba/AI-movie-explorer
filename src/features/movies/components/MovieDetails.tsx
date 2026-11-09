@@ -38,6 +38,8 @@ export const MovieDetails = () => {
 	const [movieResults, credits] = results;
 	const { data: movie, isPending, error } = movieResults;
 	const { data: cast, isPending: isCreditsPending } = credits;
+	const directors =
+		cast?.crew.filter((member) => member.job === "Director") ?? [];
 
 	//TanStack Query's dependent-query pattern
 	/*
@@ -114,6 +116,15 @@ export const MovieDetails = () => {
 							{movie.tagline && (
 								<p className="mt-3 text-lg italic text-white/50">
 									{movie.tagline}
+								</p>
+							)}
+
+							{directors.length > 0 && (
+								<p className="mt-4 text-sm text-white/60">
+									Directed by{" "}
+									<span className="font-medium text-white">
+										{directors.map((director) => director.name).join(", ")}
+									</span>
 								</p>
 							)}
 

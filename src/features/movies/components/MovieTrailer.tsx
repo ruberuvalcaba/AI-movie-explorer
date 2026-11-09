@@ -23,7 +23,7 @@ export const MovieTrailer = ({ movieTitle, videos }: MovieTrailerProps) => {
 					className="flex cursor-pointer items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					<Play size={17} fill="currentColor" />
-					{trailer ? "Watch Trailer" : "Trailer unavailable"}
+					{"Trailer"}
 				</button>
 			</Dialog.Trigger>
 			{trailer && (
