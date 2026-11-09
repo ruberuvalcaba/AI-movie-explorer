@@ -1,4 +1,36 @@
-# Profiles and a single implicit watchlist
+# Watchlist and Favorites update
+
+Migration `20261109000001_saved_movie_categories.sql` extends `saved_movies` with
+`category` (`watchlist` or `favorites`). Existing rows default to Watchlist without
+changing ownership, movie IDs, or timestamps. The primary key is now
+`(user_id, tmdb_movie_id, category)`, allowing independent membership in both
+collections. No TMDB metadata or collection management records are stored.
+
+The existing owner-only SELECT/INSERT/DELETE RLS policies cover both categories.
+The migration grants INSERT on `category`; UPDATE and client-supplied timestamps
+remain forbidden. The shared services always filter by both owner and category.
+Server Functions validate category and movie IDs and resolve the user via Auth.
+Query and mutation keys include user ID and category; mutations invalidate only
+the corresponding collection. Logout/account changes clear both private caches.
+
+Apply the category migration during a coordinated application cutover before
+serving the new build. Pause old application writes during cutover: the old
+application deletes by owner/movie only and does not understand Favorites.
+Use normal migration tracking; do not replay previously applied migration files.
+No hosted migration or deployment is performed by the local validation commands.
+The historical migration03 below still requires approval if it is pending.
+
+Local checks: `npm run test:db`, `npm run db:types`, `npx tsc --noEmit`,
+`npm run build`, `npm run test:auth`, and `npm run test:cache`.
+Tests cover category defaults, exact timestamp preservation, same-movie membership
+in both categories, duplicates, independent removal, validation, RLS, separate
+accounts, protected routes, fresh sessions, and cache cleanup. The HTTP suite uses
+mock Auth/PostgREST endpoints backed by real local PostgreSQL. Real Supabase
+sessions across browsers/devices still need a development-project smoke test.
+
+The following notes describe the earlier Watchlist migration and its cutover.
+
+# Profiles and implicit movie collections
 
 The final application schema has `profiles` and `saved_movies`. Authentication and
 profile creation/editing are unchanged. A user needs no default watchlist row:

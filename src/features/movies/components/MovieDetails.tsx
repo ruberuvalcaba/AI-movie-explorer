@@ -8,7 +8,7 @@ import { formatRuntime } from "../../../utils";
 import { movieCreditsQuery, movieDetailsQuery } from "../queries";
 import { MovieCast } from "./MovieCast";
 import { MovieTrailer } from "./MovieTrailer";
-import { SaveMovieToWatchlist } from "./SaveMovieToWatchlist";
+import { SaveMovieToCollection } from "./SaveMovieToCollection";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
@@ -141,7 +141,14 @@ export const MovieDetails = () => {
 									videos={movie.videos?.results ?? []}
 								/>
 
-								<SaveMovieToWatchlist movieId={movie.id} />
+								<SaveMovieToCollection
+									category="watchlist"
+									movieId={movie.id}
+								/>
+								<SaveMovieToCollection
+									category="favorites"
+									movieId={movie.id}
+								/>
 							</div>
 
 							{/* Bottom info */}

@@ -31,16 +31,19 @@ export type Database = {
 					user_id: string;
 					tmdb_movie_id: number;
 					added_at: string;
+					category: string;
 				};
 				Insert: {
 					user_id: string;
 					tmdb_movie_id: number;
 					added_at?: string;
+					category?: string;
 				};
 				Update: {
 					user_id?: string;
 					tmdb_movie_id?: number;
 					added_at?: string;
+					category?: string;
 				};
 				Relationships: [];
 			};

@@ -20,7 +20,7 @@ export const IconButton = ({
 }: IconButtonProps) => {
 	const navigate = useNavigate();
 	const router = useRouter();
-
+	console.log(count, "count");
 	return (
 		<button
 			type={type}
@@ -41,9 +41,9 @@ export const IconButton = ({
 				className="transition-transform duration-200 group-hover:scale-110"
 			/>
 
-			{count && Number(count) > 0 && (
+			{Number(count) >= 0 && (
 				<span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[9px] font-semibold text-black">
-					{count}
+					{Number(count) > 99 ? "99+" : count}
 				</span>
 			)}
 		</button>

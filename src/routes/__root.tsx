@@ -6,7 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Heart } from "lucide-react";
 import { IconButton } from "#/components/IconButton";
 import { MovieSearchBar } from "#/features/movies/components/MovieSearchBar";
 import { HomeButton } from "@/components/HomeButton";
@@ -55,6 +55,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { auth } = Route.useRouteContext();
 	const savedMovies = useQuery(savedMoviesQuery(auth.user?.id));
+	const favorites = useQuery(savedMoviesQuery(auth.user?.id, "favorites"));
 	return (
 		<html lang="en">
 			<head>
@@ -73,6 +74,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							icon={Bookmark}
 							count={auth.user ? savedMovies.data?.length : undefined}
 							route="/watchlist"
+						/>
+					</div>
+					<div className="shrink-0">
+						<IconButton
+							title="My favorites"
+							icon={Heart}
+							count={auth.user ? favorites.data?.length : undefined}
+							route="/favorites"
 						/>
 					</div>
 					<AccountMenu />

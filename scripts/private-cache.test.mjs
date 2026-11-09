@@ -9,17 +9,21 @@ test('account switch removes other users and preserves active-user/public cache'
  const queryClient = client();
  try {
   queryClient.setQueryData(['movies', 'popular', 1], ['public movie']);
-  queryClient.setQueryData(['private', 'previous', 'savedMovies'], ['previous secret']);
+  queryClient.setQueryData(['private', 'previous', 'savedMovies', 'watchlist'], ['previous secret']);
+  queryClient.setQueryData(['private', 'previous', 'savedMovies', 'favorites'], ['previous favorite']);
+  queryClient.setQueryData(['private', 'current', 'savedMovies', 'favorites'], ['current favorite']);
   queryClient.setQueryData(['private', 'previous', 'profile'], { displayName: 'Previous user' });
-  queryClient.setQueryData(['private', 'current', 'savedMovies'], ['current saved movie']);
+  queryClient.setQueryData(['private', 'current', 'savedMovies', 'watchlist'], ['current saved movie']);
   const mutations = queryClient.getMutationCache();
   const previous = mutations.build(queryClient, { meta: { private: true, userId: 'previous' } });
   const current = mutations.build(queryClient, { meta: { private: true, userId: 'current' } });
   const publicMutation = mutations.build(queryClient, { mutationKey: ['public'], meta: { private: false } });
   await clearPrivateCache(queryClient, 'current');
-  assert.equal(queryClient.getQueryData(['private', 'previous', 'savedMovies']), undefined);
+  assert.equal(queryClient.getQueryData(['private', 'previous', 'savedMovies', 'watchlist']), undefined);
   assert.equal(queryClient.getQueryData(['private', 'previous', 'profile']), undefined);
-  assert.deepEqual(queryClient.getQueryData(['private', 'current', 'savedMovies']), ['current saved movie']);
+  assert.equal(queryClient.getQueryData(['private', 'previous', 'savedMovies', 'favorites']), undefined);
+  assert.deepEqual(queryClient.getQueryData(['private', 'current', 'savedMovies', 'favorites']), ['current favorite']);
+  assert.deepEqual(queryClient.getQueryData(['private', 'current', 'savedMovies', 'watchlist']), ['current saved movie']);
   assert.deepEqual(queryClient.getQueryData(['movies', 'popular', 1]), ['public movie']);
   assert.ok(!mutations.getAll().includes(previous));
   assert.ok(mutations.getAll().includes(current));
@@ -30,7 +34,7 @@ test('account switch removes other users and preserves active-user/public cache'
 test('account switch aborts old in-flight reads and late mutations cannot restore private data', async () => {
  const queryClient = client();
  try {
-  const queryKey = ['private', 'previous', 'savedMovies'];
+  const queryKey = ['private', 'previous', 'savedMovies', 'watchlist'];
   let queryAborted = false;
   let finishRead;
   const oldRead = queryClient.fetchQuery({ queryKey, queryFn: ({ signal }) => new Promise((resolve, reject) => {
@@ -63,8 +67,8 @@ test('logout removes every private cache while retaining public movie data', asy
  const queryClient = client();
  try {
   queryClient.setQueryData(['movie', 278], { title: 'Public movie details' });
-  queryClient.setQueryData(['private', 'user-one', 'savedMovies'], ['one']);
-  queryClient.setQueryData(['private', 'user-two', 'savedMovies'], ['two']);
+  queryClient.setQueryData(['private', 'user-one', 'savedMovies', 'watchlist'], ['one']);
+  queryClient.setQueryData(['private', 'user-two', 'savedMovies', 'favorites'], ['two']);
   queryClient.getMutationCache().build(queryClient, { meta: { private: true, userId: 'user-one' } });
   await clearPrivateCache(queryClient);
   assert.equal(queryClient.getQueryCache().findAll({ queryKey: ['private'] }).length, 0);

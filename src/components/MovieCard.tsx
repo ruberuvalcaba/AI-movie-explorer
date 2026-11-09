@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { memo } from "react";
-import { SaveMovieToWatchlist } from "@/features/movies/components/SaveMovieToWatchlist";
+import { SaveMovieToCollection } from "@/features/movies/components/SaveMovieToCollection";
 import { usePrefetchMovie } from "@/features/movies/hooks/usePrefetchMovie";
 import type { MiniMovie, Movie } from "@/types/movie";
 
@@ -108,8 +108,19 @@ export const MovieCard = memo((props: Props) => {
 					</div>
 				</div>
 			</Link>
-			<div className="absolute right-2 top-2 z-10">
-				<SaveMovieToWatchlist movieId={movie.id} title={movie.title} compact />
+			<div className="absolute right-2 top-2 z-10 flex gap-2">
+				<SaveMovieToCollection
+					category="watchlist"
+					movieId={movie.id}
+					title={movie.title}
+					compact
+				/>
+				<SaveMovieToCollection
+					category="favorites"
+					movieId={movie.id}
+					title={movie.title}
+					compact
+				/>
 			</div>
 		</div>
 	);

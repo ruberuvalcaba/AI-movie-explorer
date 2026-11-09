@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-export const watchlistMovieInput = z.object({
+export const collectionInput = z.object({
+	category: z.enum(["watchlist", "favorites"]),
+});
+
+export const savedMovieInput = collectionInput.extend({
 	movieId: z
 		.number()
 		.int()

@@ -36,7 +36,7 @@ select pg_temp.assert_true((select length(display_name) = 100 from public.profil
 select pg_temp.assert_true((select count(*) = 0 from public.saved_movies where user_id in ('a0000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000002')), 'new users need no watchlist setup and have no sample movies');
 select pg_temp.assert_true(to_regclass('public.watchlists') is null and to_regclass('public.watchlist_movies') is null, 'obsolete tables are retired');
 select pg_temp.assert_true((select count(*) = 2 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname in ('profiles','saved_movies') and c.relrowsecurity), 'both application tables enable RLS');
-select pg_temp.assert_true((select count(*) = 3 from information_schema.columns where table_schema = 'public' and table_name = 'saved_movies'), 'saved movies store only owner, movie ID and timestamp');
+select pg_temp.assert_true((select count(*) = 4 from information_schema.columns where table_schema = 'public' and table_name = 'saved_movies'), 'saved movies store only owner, movie ID, category and timestamp');
 select pg_temp.assert_true((select count(*) = 3 from pg_policies where schemaname = 'public' and tablename = 'saved_movies' and cmd in ('SELECT','INSERT','DELETE')), 'saved movies have only three ownership policies');
 select pg_temp.assert_true((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid = 'private.create_signup_profile()'::regprocedure), 'signup function remains hardened');
 select pg_temp.assert_true(not has_function_privilege('authenticated', 'private.create_signup_profile()', 'execute'), 'signup function is not callable by users');
@@ -59,6 +59,18 @@ insert into public.saved_movies (user_id, tmdb_movie_id) values (auth.uid(), 278
 select pg_temp.assert_true((select count(*) = 2 from public.saved_movies), 'owner can add and read movies');
 select pg_temp.assert_true((select bool_and(added_at is not null) from public.saved_movies), 'database supplies added_at');
 select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id) values (auth.uid(),278)$q$, '23505', 'same user cannot save a movie twice');
+insert into public.saved_movies (user_id,tmdb_movie_id,category) values (auth.uid(),278,'favorites');
+select pg_temp.assert_true((select count(*) = 2 from public.saved_movies where tmdb_movie_id=278), 'same movie may belong to both categories');
+select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id,category) values (auth.uid(),278,'favorites')$q$, '23505', 'duplicate favorite rejected');
+select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id,category) values (auth.uid(),999,'custom')$q$, '23514', 'custom categories rejected');
+select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id,category) values (auth.uid(),999,null)$q$, '23502', 'null category rejected');
+select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id,category) values ('b0000000-0000-4000-8000-000000000002',278,'favorites')$q$, '42501', 'foreign favorite insertion rejected');
+delete from public.saved_movies where tmdb_movie_id=278 and category='watchlist';
+select pg_temp.assert_true((select count(*)=1 from public.saved_movies where tmdb_movie_id=278 and category='favorites'), 'watchlist removal preserves favorites');
+insert into public.saved_movies (user_id,tmdb_movie_id) values (auth.uid(),278);
+delete from public.saved_movies where tmdb_movie_id=278 and category='favorites';
+select pg_temp.assert_true((select count(*)=1 from public.saved_movies where tmdb_movie_id=278 and category='watchlist'), 'favorite removal preserves watchlist');
+
 select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id) values ('b0000000-0000-4000-8000-000000000002',999)$q$, '42501', 'cannot save for another user');
 select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id) values (auth.uid(),0)$q$, '23514', 'zero TMDB ID rejected');
 select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id) values (auth.uid(),-1)$q$, '23514', 'negative TMDB ID rejected');
@@ -73,7 +85,8 @@ select set_config('request.jwt.claim.sub', 'b0000000-0000-4000-8000-000000000002
 select set_config('request.jwt.claims', '{"sub":"b0000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select pg_temp.assert_true((select count(*) = 0 from public.saved_movies), 'Bob cannot read Alice saved movies');
 insert into public.saved_movies (user_id,tmdb_movie_id) values (auth.uid(),278);
-select pg_temp.assert_true((select count(*) = 1 from public.saved_movies), 'different users can independently save the same TMDB ID');
+insert into public.saved_movies (user_id,tmdb_movie_id,category) values (auth.uid(),550,'favorites');
+select pg_temp.assert_true((select count(*) = 2 from public.saved_movies), 'different users can independently save the same TMDB ID');
 delete from public.saved_movies where user_id = 'a0000000-0000-4000-8000-000000000001' and tmdb_movie_id = 278;
 select pg_temp.expect_error($q$insert into public.saved_movies (user_id,tmdb_movie_id) values ('a0000000-0000-4000-8000-000000000001',999)$q$, '42501', 'Bob cannot insert into Alice watchlist');
 

@@ -5,22 +5,35 @@ import {
 	insertSavedMovie,
 	readSavedMovies,
 } from "../services/watchlist.server";
-import { watchlistMovieInput } from "../watchlist.schemas";
+import { collectionInput, savedMovieInput } from "../watchlist.schemas";
 
 export const getSavedMovies = createServerFn({ method: "GET" })
 	.middleware([requireAuth])
-	.handler(({ context }) => readSavedMovies(context.supabase, context.user.id));
-
-export const addMovieToWatchlist = createServerFn({ method: "POST" })
-	.middleware([requireAuth])
-	.validator(watchlistMovieInput)
+	.validator(collectionInput)
 	.handler(({ context, data }) =>
-		insertSavedMovie(context.supabase, context.user.id, data.movieId),
+		readSavedMovies(context.supabase, context.user.id, data.category),
 	);
 
-export const removeMovieFromWatchlist = createServerFn({ method: "POST" })
+export const addSavedMovie = createServerFn({ method: "POST" })
 	.middleware([requireAuth])
-	.validator(watchlistMovieInput)
+	.validator(savedMovieInput)
 	.handler(({ context, data }) =>
-		destroySavedMovie(context.supabase, context.user.id, data.movieId),
+		insertSavedMovie(
+			context.supabase,
+			context.user.id,
+			data.category,
+			data.movieId,
+		),
+	);
+
+export const removeSavedMovie = createServerFn({ method: "POST" })
+	.middleware([requireAuth])
+	.validator(savedMovieInput)
+	.handler(({ context, data }) =>
+		destroySavedMovie(
+			context.supabase,
+			context.user.id,
+			data.category,
+			data.movieId,
+		),
 	);

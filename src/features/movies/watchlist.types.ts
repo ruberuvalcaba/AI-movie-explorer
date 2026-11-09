@@ -4,3 +4,5 @@ export type SavedMovie = Pick<
 	Database["public"]["Tables"]["saved_movies"]["Row"],
 	"tmdb_movie_id" | "added_at"
 >;
+
+export type MovieCollection = "watchlist" | "favorites";

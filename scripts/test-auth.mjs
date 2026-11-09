@@ -99,7 +99,7 @@ const mock = createServer(async (req, res) => {
   } else if (url.pathname === '/rest/v1/saved_movies') {
    if (!authenticated || revoked.has(authenticated.id)) { send(401, { message: 'Unauthorized' }); return; }
    if (watchlistFailure) { send(503, { code: 'PGRST000', message: 'Database unavailable' }); return; }
-   const allowedColumns = ['user_id', 'tmdb_movie_id', 'added_at'];
+   const allowedColumns = ['user_id', 'tmdb_movie_id', 'added_at', 'category'];
    const projection = url.searchParams.get('select') ?? '*';
    const projectedColumns = projection === '*' ? allowedColumns : projection.split(',').map(column => column.trim());
    assert.ok(projectedColumns.every(column => allowedColumns.includes(column)), 'No metadata may be fetched from saved_movies');
@@ -127,21 +127,23 @@ const mock = createServer(async (req, res) => {
      await tx.query("select set_config('request.jwt.claim.sub',$1,true)", [authenticated.id]);
      if (req.method === 'POST') {
       watchlistWrites++;
-      assert.deepEqual(Object.keys(input).sort(), ['tmdb_movie_id', 'user_id'], 'Only verified ownership and movie ID may be written');
+      assert.deepEqual(Object.keys(input).sort(), ['category', 'tmdb_movie_id', 'user_id'], 'Only verified ownership and movie ID may be written');
       assert.equal(input.user_id, authenticated.id, 'Owner must come from verified identity');
       const ignoreDuplicate = req.headers.prefer?.includes('resolution=ignore-duplicates') ? ' on conflict do nothing' : '';
       // No RETURNING clause: INSERT grants need not imply metadata SELECT grants.
-      await tx.query(`insert into public.saved_movies (user_id,tmdb_movie_id) values ($1,$2)${ignoreDuplicate}`, [input.user_id, input.tmdb_movie_id]);
+      await tx.query(`insert into public.saved_movies (user_id,tmdb_movie_id,category) values ($1,$2,$3)${ignoreDuplicate}`, [input.user_id, input.tmdb_movie_id, input.category]);
       return [];
      }
      if (req.method === 'DELETE') {
       watchlistWrites++;
       assert.equal(url.searchParams.get('user_id'), `eq.${authenticated.id}`, 'Deletes must filter the verified owner');
       assert.ok(url.searchParams.has('tmdb_movie_id'), 'Deletes target a single saved movie');
+      assert.ok(['eq.watchlist', 'eq.favorites'].includes(url.searchParams.get('category')), 'Deletes target one category');
       await tx.query(`delete from public.saved_movies${where}`, values);
       return [];
      }
      assert.equal(req.method, 'GET');
+     assert.ok(['eq.watchlist', 'eq.favorites'].includes(url.searchParams.get('category')), 'Reads target one category');
      assert.equal(url.searchParams.get('user_id'), `eq.${authenticated.id}`, 'Reads must filter the verified owner');
      const allRows = (await tx.query(`select ${projectedColumns.join(',')} from public.saved_movies${where}${order.length ? ` order by ${order.join(',')}` : ''}`, values)).rows;
      totalCount = allRows.length;
@@ -180,6 +182,7 @@ try {
   for (const match of source.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)) ids[match[2]] = match[1];
  }
  async function rpc(name, { method = 'GET', data, cookie = '', origin = base } = {}) {
+  if (['getSavedMovies', 'addSavedMovie', 'removeSavedMovie'].includes(name)) data = { category: 'watchlist', ...data };
   assert.ok(ids[name], `Built server function ${name} exists`);
   const target = new URL(`${base}/_serverFn/${ids[name]}`);
   if (method === 'GET' && data !== undefined) target.searchParams.set('payload', JSON.stringify(toJSON({ data })));
@@ -191,7 +194,7 @@ try {
  }
  const decode = async response => fromCrossJSON(await response.json(), { refs: new Map(), plugins: defaultSerovalDeserializerPlugins });
  const cookieJar = response => response.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
- for (const path of ['/profile', '/watchlist']) {
+ for (const path of ['/profile', '/watchlist', '/favorites']) {
   const response = await fetch(`${base}${path}`, { redirect: 'manual' });
   assert.equal(response.status, 307, path);
   assert.equal(new URL(response.headers.get('location'), base).pathname, '/login');
@@ -200,8 +203,8 @@ try {
  assert.equal((await rpc('getAccount')).status, 401);
  assert.equal((await rpc('updateProfile', { method: 'POST', data: { displayName: 'Anonymous' } })).status, 401);
  assert.equal((await rpc('getSavedMovies')).status, 401);
- assert.equal((await rpc('addMovieToWatchlist', { method: 'POST', data: { movieId: 278 } })).status, 401);
- assert.equal((await rpc('removeMovieFromWatchlist', { method: 'POST', data: { movieId: 278 } })).status, 401);
+ assert.equal((await rpc('addSavedMovie', { method: 'POST', data: { movieId: 278 } })).status, 401);
+ assert.equal((await rpc('removeSavedMovie', { method: 'POST', data: { movieId: 278 } })).status, 401);
  assert.equal((await rpc('signIn', { method: 'POST', origin: 'https://other.example', data: { email: user.email, password: 'password123' } })).status, 403);
  const failed = await decode(await rpc('signIn', { method: 'POST', data: { email: user.email, password: 'wrong' } }));
  assert.ok(failed.result.error);
@@ -253,16 +256,11 @@ try {
  const cookie = cookieJar(login); assert.match(cookie, /auth-token/);
  assert.match(login.headers.get('cache-control'), /no-store/);
  assert.ok(login.headers.getSetCookie().every(value => /Secure/i.test(value) && /SameSite=Lax/i.test(value)));
- const headerProfileLink = html => {
-  const anchor = html.match(/<a\b(?=[^>]*\bhref="\/profile")[^>]*>[\s\S]*?<\/a>/);
-  assert.ok(anchor, 'Header contains an authenticated profile link');
-  return anchor[0];
- };
- const assertHeaderLabel = (html, label) => {
-  const anchor = headerProfileLink(html);
-  assert.ok(anchor.includes(`>${label}</a>`), `Header uses ${JSON.stringify(label)} as its account label`);
-  assert.ok(anchor.includes(`title="${label}"`), 'Header tooltip uses the same account label');
-  if (label !== user.email) assert.ok(!anchor.includes(user.email), 'Header does not reveal email when a display name exists');
+ const assertAccountMenu = async (html, label) => {
+  assert.match(html, /aria-label="Account options"/, 'Authenticated header exposes the account menu');
+  // Menu contents mount on interaction; verify its label source through Auth.
+  const auth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
+  assert.equal(auth.user.displayName || auth.user.email, label, 'Account menu label uses display name with email fallback');
  };
  const defaultLoginReturn = await fetch(`${base}/login`, { headers: { Cookie: cookie }, redirect: 'manual' });
  assert.equal(defaultLoginReturn.status, 307);
@@ -286,7 +284,7 @@ try {
  const initialAuth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
  assert.equal(initialAuth.user.id, user.id);
  assert.equal(initialAuth.user.displayName, '');
- assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
+ await assertAccountMenu(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
  const cookieName = cookie.slice(0, cookie.indexOf('='));
  const oldSession = { ...session(), expires_at: Math.floor(Date.now() / 1000) - 60 };
  const expiredCookie = `${cookieName}=base64-${Buffer.from(JSON.stringify(oldSession)).toString('base64url')}`;
@@ -323,7 +321,7 @@ try {
  const profileHtml = await profile.text();
  assert.ok(profileHtml.includes(user.email));
  assert.ok(profileHtml.includes('Movie Fan'));
- assertHeaderLabel(profileHtml, 'Movie Fan');
+ await assertAccountMenu(profileHtml, 'Movie Fan');
  assert.match(profile.headers.get('cache-control'), /no-store/);
  // Separate documents with the same cookie model refresh and session restoration.
  const refreshed = await fetch(`${base}/profile`, { headers: { Cookie: cookie } });
@@ -331,14 +329,14 @@ try {
  // Profile names are optional presentation data: blank names or unavailable
  // profile storage must not invalidate an otherwise verified Auth session.
  await db.query('update public.profiles set display_name=$1 where id=$2', ['  Movie Fan  ', user.id]);
- assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), 'Movie Fan');
+ await assertAccountMenu(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), 'Movie Fan');
  await db.query('update public.profiles set display_name=$1 where id=$2', ['   ', user.id]);
- assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
+ await assertAccountMenu(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
  profileFailure = true;
  const degradedAuth = (await decode(await rpc('getAuthStatus', { cookie }))).result;
  assert.equal(degradedAuth.user.id, user.id, 'A profile read failure must not sign the user out');
  assert.equal(degradedAuth.user.email, user.email);
- assertHeaderLabel(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
+ await assertAccountMenu(await (await fetch(`${base}/profile`, { headers: { Cookie: cookie } })).text(), user.email);
  profileFailure = false;
  await db.query('update public.profiles set display_name=$1 where id=$2', ['Movie Fan', user.id]);
  const otherLogin = await rpc('signIn', { method: 'POST', data: { email: otherUser.email, password: 'password123' } });
@@ -370,28 +368,28 @@ try {
  assert.equal((await db.query("select to_regclass('public.watchlist_movies') as entries")).rows[0].entries, null);
  assert.deepEqual(await resultOf('getSavedMovies', { cookie }), [], 'New account has an empty implicit watchlist');
  assert.equal((await db.query('select count(*)::int as count from public.saved_movies')).rows[0].count, 0, 'No sample movies saved');
- await resultOf('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 278, userId: otherUser.id, user_id: otherUser.id } });
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 278, userId: otherUser.id, user_id: otherUser.id } });
  const firstSave = await resultOf('getSavedMovies', { cookie });
  assert.equal(firstSave.length, 1);
  assert.equal(firstSave[0].tmdb_movie_id, 278);
  assert.deepEqual(Object.keys(firstSave[0]).sort(), ['added_at', 'tmdb_movie_id'], 'No list entity, user ID or metadata leaks into SavedMovie model');
  assert.ok(!Number.isNaN(Date.parse(firstSave[0].added_at)), 'Save timestamp is present');
- await resultOf('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 278 } });
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 278 } });
  assert.deepEqual(await resultOf('getSavedMovies', { cookie }), firstSave, 'Adding twice is idempotent and preserves original date');
- await resultOf('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 550 } });
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 550 } });
  const invalidWrites = watchlistWrites;
  for (const movieId of [0, -1, 1.5, 2147483648, '278', null]) {
-  await denied('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId } });
-  await denied('removeMovieFromWatchlist', { method: 'POST', cookie, data: { movieId } });
+  await denied('addSavedMovie', { method: 'POST', cookie, data: { movieId } });
+  await denied('removeSavedMovie', { method: 'POST', cookie, data: { movieId } });
  }
- await denied('addMovieToWatchlist', { method: 'POST', cookie, data: {} });
+ await denied('addSavedMovie', { method: 'POST', cookie, data: {} });
  assert.equal(watchlistWrites, invalidWrites, 'Invalid movie IDs never write PostgreSQL');
  assert.deepEqual(await resultOf('getSavedMovies', { cookie: otherCookie }), [], 'Second account starts independently empty');
- await resultOf('addMovieToWatchlist', { method: 'POST', cookie: otherCookie, data: { movieId: 278, userId: user.id } });
+ await resultOf('addSavedMovie', { method: 'POST', cookie: otherCookie, data: { movieId: 278, userId: user.id } });
  assert.deepEqual((await resultOf('getSavedMovies', { cookie: otherCookie })).map(movie => movie.tmdb_movie_id), [278], 'Both accounts may save the same movie');
  assert.equal((await db.query('select count(*)::int as count from public.saved_movies where tmdb_movie_id=278')).rows[0].count, 2);
  const ownerBefore = await resultOf('getSavedMovies', { cookie });
- await resultOf('removeMovieFromWatchlist', { method: 'POST', cookie: otherCookie, data: { movieId: 550, userId: user.id, user_id: user.id } });
+ await resultOf('removeSavedMovie', { method: 'POST', cookie: otherCookie, data: { movieId: 550, userId: user.id, user_id: user.id } });
  assert.deepEqual(await resultOf('getSavedMovies', { cookie }), ownerBefore, 'Submitted foreign identity cannot remove another account movie');
  await db.transaction(async tx => {
   await tx.exec('set local role authenticated');
@@ -404,16 +402,39 @@ try {
   await tx.query("select set_config('request.jwt.claim.sub',$1,true)", [otherUser.id]);
   await tx.query('insert into public.saved_movies (user_id,tmdb_movie_id) values ($1,999)', [user.id]);
  }), error => error.code === '42501', 'RLS denies direct cross-owner insertion');
- assert.equal((await rpc('addMovieToWatchlist', { method: 'POST', cookie, origin: 'https://other.example', data: { movieId: 999 } })).status, 403);
- assert.equal((await rpc('removeMovieFromWatchlist', { method: 'POST', cookie, origin: 'https://other.example', data: { movieId: 278 } })).status, 403);
+ assert.equal((await rpc('addSavedMovie', { method: 'POST', cookie, origin: 'https://other.example', data: { movieId: 999 } })).status, 403);
+ assert.equal((await rpc('removeSavedMovie', { method: 'POST', cookie, origin: 'https://other.example', data: { movieId: 278 } })).status, 403);
  watchlistFailure = true;
  await denied('getSavedMovies', { cookie });
- await denied('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 999 } });
- await denied('removeMovieFromWatchlist', { method: 'POST', cookie, data: { movieId: 550 } });
+ await denied('addSavedMovie', { method: 'POST', cookie, data: { movieId: 999 } });
+ await denied('removeSavedMovie', { method: 'POST', cookie, data: { movieId: 550 } });
  watchlistFailure = false;
  const newDeviceLogin = await rpc('signIn', { method: 'POST', data: { email: user.email, password: 'password123' } });
  const newDeviceCookie = cookieJar(newDeviceLogin);
  assert.deepEqual(await resultOf('getSavedMovies', { cookie: newDeviceCookie }), ownerBefore, 'Fresh session sees persisted saved movies');
+ // Favorites share persistence/auth but never membership with Watchlist.
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 278, category: 'favorites' } });
+ const firstFavorite = await resultOf('getSavedMovies', { cookie, data: { category: 'favorites' } });
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 278, category: 'favorites' } });
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie: newDeviceCookie, data: { category: 'favorites' } }), firstFavorite, 'Favorite is idempotent and persists in a fresh session');
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie }), ownerBefore, 'Adding favorite preserves Watchlist');
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie: otherCookie, data: { category: 'favorites' } }), [], 'Other account cannot see favorites');
+ await resultOf('removeSavedMovie', { method: 'POST', cookie: otherCookie, data: { movieId: 278, category: 'favorites', userId: user.id } });
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie, data: { category: 'favorites' } }), firstFavorite, 'Foreign favorite removal is isolated');
+ await resultOf('removeSavedMovie', { method: 'POST', cookie, data: { movieId: 278, category: 'favorites' } });
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie }), ownerBefore, 'Removing favorite preserves Watchlist');
+ await resultOf('addSavedMovie', { method: 'POST', cookie, data: { movieId: 278, category: 'favorites' } });
+ const restoredFavorite = await resultOf('getSavedMovies', { cookie, data: { category: 'favorites' } });
+ const favoritePage = await fetch(`${base}/favorites`, { headers: { Cookie: newDeviceCookie } });
+ assert.equal(favoritePage.status, 200);
+ assert.ok((await favoritePage.text()).includes('My Favorites'), 'Favorites page renders after a fresh session');
+ const writesBeforeInvalidCategories = watchlistWrites;
+ for (const category of ['custom', '', null, 1, undefined]) {
+  await denied('addSavedMovie', { method: 'POST', cookie, data: { movieId: 999, category } });
+  await denied('removeSavedMovie', { method: 'POST', cookie, data: { movieId: 278, category } });
+  await denied('getSavedMovies', { cookie, data: { category } });
+ }
+ assert.equal(watchlistWrites, writesBeforeInvalidCategories, 'Invalid categories never reach storage');
  const savedPage = await fetch(`${base}/watchlist`, { headers: { Cookie: newDeviceCookie } });
  assert.equal(savedPage.status, 200);
  const savedPageHtml = await savedPage.text();
@@ -428,10 +449,11 @@ try {
  assert.equal(largeMovies.length, 1005, 'Pagination retrieves all saved movies past row caps');
  assert.equal(new Set(largeMovies.map(movie => movie.tmdb_movie_id)).size, 1005, 'No omitted or duplicate pagination boundaries');
  await db.query('delete from public.saved_movies where user_id=$1 and tmdb_movie_id between 10000 and 11002', [user.id]);
- await resultOf('removeMovieFromWatchlist', { method: 'POST', cookie: newDeviceCookie, data: { movieId: 278 } });
- await resultOf('removeMovieFromWatchlist', { method: 'POST', cookie: newDeviceCookie, data: { movieId: 278 } });
+ await resultOf('removeSavedMovie', { method: 'POST', cookie: newDeviceCookie, data: { movieId: 278 } });
+ await resultOf('removeSavedMovie', { method: 'POST', cookie: newDeviceCookie, data: { movieId: 278 } });
  assert.deepEqual((await resultOf('getSavedMovies', { cookie })).map(movie => movie.tmdb_movie_id), [550], 'Removal persists and is idempotent');
  assert.deepEqual((await resultOf('getSavedMovies', { cookie: otherCookie })).map(movie => movie.tmdb_movie_id), [278], 'Removing from one account leaves another account untouched');
+ assert.deepEqual(await resultOf('getSavedMovies', { cookie: newDeviceCookie, data: { category: 'favorites' } }), restoredFavorite, 'Watchlist removal leaves Favorites intact');
  const refreshedWatchlist = await fetch(`${base}/watchlist`, { headers: { Cookie: cookie } });
  assert.equal(refreshedWatchlist.status, 200, 'Saved watchlist survives document refresh');
  const logout = await rpc('signOut', { method: 'POST', cookie });
@@ -439,8 +461,8 @@ try {
  assert.equal((await rpc('getAccount')).status, 401);
  assert.equal((await rpc('updateProfile', { method: 'POST', cookie, data: { displayName: 'After logout' } })).status, 401, 'Revoked sessions cannot update profiles');
  assert.equal((await rpc('getSavedMovies', { cookie })).status, 401, 'Revoked sessions cannot access saved movies');
- assert.equal((await rpc('addMovieToWatchlist', { method: 'POST', cookie, data: { movieId: 999 } })).status, 401, 'Revoked sessions cannot save movies');
- console.log('PASS: Home/previous-page auth redirects, display-name header with email fallback, registration with/without confirmation, safe token/PKCE callbacks, login/logout, SSR refresh/renewal, editable profiles, implicit saved movies, empty signup, duplicate handling, no management interfaces, input validation, account isolation, CSRF and protected operations (mock Auth + real local PostgreSQL).');
+ assert.equal((await rpc('addSavedMovie', { method: 'POST', cookie, data: { movieId: 999 } })).status, 401, 'Revoked sessions cannot save movies');
+ console.log('PASS: Home/previous-page auth redirects, account menu with display-name/email fallback, registration with/without confirmation, safe token/PKCE callbacks, login/logout, SSR refresh/renewal, editable profiles, independent Watchlist/Favorites, empty signup, duplicate handling, no management interfaces, input validation, account isolation, CSRF and protected operations (mock Auth + real local PostgreSQL).');
 } finally {
  child.kill();
  await new Promise(resolve => mock.close(resolve));

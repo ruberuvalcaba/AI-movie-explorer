@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiRouteImport } from './routes/ai'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -27,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const AiRoute = AiRouteImport.update({
   id: '/ai',
   path: '/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -68,6 +74,7 @@ const MovieMovieIdRoute = MovieMovieIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/favorites': typeof FavoritesRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/favorites': typeof FavoritesRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
+  '/favorites': typeof FavoritesRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/profile': typeof ProfileRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ai'
+    | '/favorites'
     | '/login'
     | '/mcp'
     | '/profile'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ai'
+    | '/favorites'
     | '/login'
     | '/mcp'
     | '/profile'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ai'
+    | '/favorites'
     | '/login'
     | '/mcp'
     | '/profile'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiRoute: typeof AiRoute
+  FavoritesRoute: typeof FavoritesRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ProfileRoute: typeof ProfileRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/ai'
       fullPath: '/ai'
       preLoaderRoute: typeof AiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiRoute: AiRoute,
+  FavoritesRoute: FavoritesRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ProfileRoute: ProfileRoute,

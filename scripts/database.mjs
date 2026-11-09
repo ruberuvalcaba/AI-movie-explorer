@@ -104,6 +104,12 @@ try {
     assert.deepEqual((await db.query("select user_id,tmdb_movie_id,to_char(added_at at time zone 'UTC','YYYY-MM-DD') as saved_date from public.saved_movies order by user_id,tmdb_movie_id")).rows, saved, 'Reapplying a completed transition does not lose data');
     upgradeChecks++;
    }
+  } else if (name === '20261109000001_saved_movie_categories.sql') {
+   const before = (await db.query('select * from public.saved_movies order by user_id,tmdb_movie_id')).rows;
+   await db.exec(sql);
+   const after = (await db.query('select * from public.saved_movies order by user_id,tmdb_movie_id')).rows;
+   assert.deepEqual(after, before.map(row => ({ ...row, category: 'watchlist' })), 'Category upgrade preserves every owner, movie and exact timestamp');
+   upgradeChecks++;
   } else {
    await db.exec(sql);
   }

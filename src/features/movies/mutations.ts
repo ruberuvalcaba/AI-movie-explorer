@@ -1,34 +1,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-	addMovieToWatchlist,
-	removeMovieFromWatchlist,
-} from "./api/watchlist.functions";
-import { watchlistKeys } from "./watchlist.queries";
+import { addSavedMovie, removeSavedMovie } from "./api/watchlist.functions";
+import { savedMovieKeys } from "./watchlist.queries";
+import type { MovieCollection } from "./watchlist.types";
 
-export function useAddMovieToWatchlist(userId: string) {
+export function useAddSavedMovie(userId: string, category: MovieCollection) {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationKey: [...watchlistKeys.all(userId), "add"],
+		mutationKey: [...savedMovieKeys.all(userId, category), "add"],
 		meta: { private: true, userId },
-		mutationFn: (data: { movieId: number }) => addMovieToWatchlist({ data }),
+		mutationFn: (data: { movieId: number }) =>
+			addSavedMovie({ data: { ...data, category } }),
 		onSuccess: () =>
 			queryClient.invalidateQueries({
-				queryKey: watchlistKeys.all(userId),
+				queryKey: savedMovieKeys.all(userId, category),
 				exact: true,
 			}),
 	});
 }
 
-export function useRemoveMovieFromWatchlist(userId: string) {
+export function useRemoveSavedMovie(userId: string, category: MovieCollection) {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationKey: [...watchlistKeys.all(userId), "remove"],
+		mutationKey: [...savedMovieKeys.all(userId, category), "remove"],
 		meta: { private: true, userId },
 		mutationFn: (data: { movieId: number }) =>
-			removeMovieFromWatchlist({ data }),
+			removeSavedMovie({ data: { ...data, category } }),
 		onSuccess: () =>
 			queryClient.invalidateQueries({
-				queryKey: watchlistKeys.all(userId),
+				queryKey: savedMovieKeys.all(userId, category),
 				exact: true,
 			}),
 	});

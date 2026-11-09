@@ -7,30 +7,43 @@ import { MovieCard } from "@/components/MovieCard";
 import { Route as RootRoute } from "@/routes/__root";
 import { movieDetailsQuery } from "../queries";
 import { savedMoviesQuery } from "../watchlist.queries";
-import { SaveMovieToWatchlist } from "./SaveMovieToWatchlist";
+import type { MovieCollection } from "../watchlist.types";
+import { SaveMovieToCollection } from "./SaveMovieToCollection";
 
 const buttonClass =
 	"rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15";
 
-export function MyWatchlist() {
+export function MyCollection({ category }: { category: MovieCollection }) {
 	const { auth } = RootRoute.useRouteContext();
 	if (!auth.user)
 		return (
 			<main className="mx-auto mt-28 max-w-7xl px-4 text-white">
 				<Link
 					to="/login"
-					search={{ redirect: "/watchlist" }}
+					search={{ redirect: `/${category}` }}
 					className="underline"
 				>
-					Sign in to view your watchlist
+					Sign in to view your {category}
 				</Link>
 			</main>
 		);
-	return <SavedMoviesPage key={auth.user.id} userId={auth.user.id} />;
+	return (
+		<SavedMoviesPage
+			key={auth.user.id}
+			userId={auth.user.id}
+			category={category}
+		/>
+	);
 }
 
-function SavedMoviesPage({ userId }: { userId: string }) {
-	const movies = useQuery(savedMoviesQuery(userId));
+function SavedMoviesPage({
+	userId,
+	category,
+}: {
+	userId: string;
+	category: MovieCollection;
+}) {
+	const movies = useQuery(savedMoviesQuery(userId, category));
 	const movieQueries = useQueries({
 		queries: (movies.data ?? []).map((entry) =>
 			movieDetailsQuery(entry.tmdb_movie_id),
@@ -41,18 +54,18 @@ function SavedMoviesPage({ userId }: { userId: string }) {
 			<div className="flex items-center">
 				<IconButton title="Go back" icon={ChevronLeft} goBack />
 				<MovieSectionHeader
-					title="My Watchlist"
+					title={category === "favorites" ? "My Favorites" : "My Watchlist"}
 					count={movies.data?.length ?? 0}
 				/>
 			</div>
 			{movies.isPending && (
 				<output className="block py-6 text-white/60">
-					Loading your watchlist…
+					Loading your {category}…
 				</output>
 			)}
 			{movies.isError && (
 				<div role="alert" className="space-y-3 py-6">
-					<p>Unable to load your watchlist. Please try again.</p>
+					<p>Unable to load your {category}. Please try again.</p>
 					<button
 						type="button"
 						className={buttonClass}
@@ -64,7 +77,7 @@ function SavedMoviesPage({ userId }: { userId: string }) {
 			)}
 			{movies.isSuccess && !movies.data.length && (
 				<div className="space-y-3 py-8 text-white/60">
-					<p>Your watchlist is empty. Save a movie to find it here later.</p>
+					<p>Your {category} is empty. Save a movie to find it here later.</p>
 					<Link to="/" className="text-white underline">
 						Browse movies
 					</Link>
@@ -97,7 +110,8 @@ function SavedMoviesPage({ userId }: { userId: string }) {
 										<output>Loading movie…</output>
 									)}
 								</div>
-								<SaveMovieToWatchlist
+								<SaveMovieToCollection
+									category={category}
 									movieId={entry.tmdb_movie_id}
 									title={`movie ${entry.tmdb_movie_id}`}
 								/>
