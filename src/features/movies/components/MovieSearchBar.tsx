@@ -1,21 +1,49 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { searchMoviesQuery } from "../queries";
+import { MovieSearchSuggestions } from "./MovieSearchSuggestions";
 
 export const MovieSearchBar = () => {
 	const navigate = useNavigate();
 	const search = useSearch({ strict: false });
 	const query = search.q ?? "";
 	const [input, setInput] = useState(query);
+	const [suggestionQuery, setSuggestionQuery] = useState("");
+	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
 	useEffect(() => {
 		setInput(query);
+		setSuggestionsOpen(false);
 	}, [query]);
+	useEffect(() => {
+		const timeout = window.setTimeout(() => {
+			setSuggestionQuery(input.trim());
+		}, 300);
+		return () => window.clearTimeout(timeout);
+	}, [input]);
+	const { data, isFetching, isError } = useInfiniteQuery({
+		...searchMoviesQuery(suggestionQuery),
+		enabled: suggestionsOpen && suggestionQuery.length > 0,
+	});
+	const movies = data?.pages[0]?.results.slice(0, 5) ?? [];
+	const showSuggestions = suggestionsOpen && input.trim().length > 0;
+	const waitingForSearch = input.trim() !== suggestionQuery || isFetching;
 	return (
 		<form
 			aria-label="Search movies"
-			className="mx-auto flex min-w-0 max-w-2xl flex-1 gap-1 sm:gap-2"
+			className="relative mx-auto flex min-w-0 max-w-2xl flex-1 gap-1 sm:gap-2"
+			onBlur={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget)) {
+					setSuggestionsOpen(false);
+				}
+			}}
+			onKeyDown={(event) => {
+				if (event.key === "Escape") setSuggestionsOpen(false);
+			}}
 			onSubmit={(event) => {
 				event.preventDefault();
+				setSuggestionsOpen(false);
 				void navigate({ to: "/", search: { q: input.trim() || undefined } });
 			}}
 		>
@@ -29,7 +57,13 @@ export const MovieSearchBar = () => {
 					value={input}
 					onChange={(event) => {
 						setInput(event.target.value);
+						setSuggestionsOpen(true);
 					}}
+					onFocus={() => setSuggestionsOpen(true)}
+					autoComplete="off"
+					aria-controls={
+						showSuggestions ? "movie-search-suggestions" : undefined
+					}
 					maxLength={200}
 					placeholder="Search movies..."
 					className="min-w-0 w-full bg-transparent py-3 text-base text-white outline-none placeholder:text-white/50"
@@ -47,6 +81,7 @@ export const MovieSearchBar = () => {
 						type="button"
 						onClick={() => {
 							setInput("");
+							setSuggestionsOpen(false);
 							void navigate({ to: "/", search: {} });
 						}}
 						className="cursor-pointer"
@@ -55,6 +90,14 @@ export const MovieSearchBar = () => {
 					</button>
 				)}
 			</div>
+			{showSuggestions && (
+				<MovieSearchSuggestions
+					movies={movies}
+					isLoading={waitingForSearch}
+					isError={isError}
+					onSelect={() => setSuggestionsOpen(false)}
+				/>
+			)}
 		</form>
 	);
 };

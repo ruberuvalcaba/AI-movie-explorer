@@ -119,10 +119,10 @@ body::before {
 }
 
 /* Keep clearing in the explicit search controls instead of the native icon. */
-#movie-search::-webkit-search-cancel-button {
+/* #movie-search::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
-}
+} */
 
 /* Firefox */
 
