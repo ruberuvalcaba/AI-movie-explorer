@@ -15,7 +15,7 @@ import { HomeButton } from "@/components/HomeButton";
 import { MovieAssistant } from "@/features/assistant/components/MovieAssistant";
 import { getAuthStatus } from "@/features/auth/api/auth.functions";
 import { AccountMenu } from "@/features/auth/components/AccountMenu";
-import { savedMoviesQuery } from "@/features/movies/watchlist.queries";
+import { savedMoviesQuery } from "@/features/movies/collection.queries";
 import { clearPrivateCache } from "@/integrations/tanstack-query/private-cache";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";

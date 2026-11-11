@@ -206,7 +206,7 @@ try {
  const assets = 'node_modules/.nitro/vite/services/ssr/assets';
  const ids = {};
  for (const file of await readdir(assets)) {
-  if (!/^(auth.functions|account.functions|profile.functions|watchlist.functions|recovery.functions|movie.functions)-/.test(file)) continue;
+  if (!/^(auth.functions|account.functions|profile.functions|collection.functions|recovery.functions|movie.functions)-/.test(file)) continue;
   const source = await readFile(`${assets}/${file}`, 'utf8');
   for (const match of source.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)) ids[match[2]] = match[1];
  }

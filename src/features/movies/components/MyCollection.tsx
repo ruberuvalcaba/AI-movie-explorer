@@ -2,8 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
 import { Route as RootRoute } from "@/routes/__root";
-import { savedMoviesQuery } from "../watchlist.queries";
-import type { MovieCollection } from "../watchlist.types";
+import { savedMoviesQuery } from "../collection.queries";
+import type { MovieCollection } from "../collection.types";
 import { CollectionMovieGrid } from "./CollectionMovieGrid";
 
 const buttonClass =

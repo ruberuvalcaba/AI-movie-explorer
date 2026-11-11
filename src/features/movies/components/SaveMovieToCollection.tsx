@@ -2,9 +2,9 @@ import { useIsMutating, useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Bookmark, CircleAlert, Heart, LoaderCircle } from "lucide-react";
 import { Route as RootRoute } from "@/routes/__root";
+import { savedMovieKeys, savedMoviesQuery } from "../collection.queries";
+import type { MovieCollection } from "../collection.types";
 import { useAddSavedMovie, useRemoveSavedMovie } from "../mutations";
-import { savedMovieKeys, savedMoviesQuery } from "../watchlist.queries";
-import type { MovieCollection } from "../watchlist.types";
 
 type Props = {
 	movieId: number;

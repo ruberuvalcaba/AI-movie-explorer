@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MovieCard } from "#/components/MovieCard";
 import type { MiniMovie } from "#/types/movie";
+import type { MovieCollection, SavedMovie } from "../collection.types";
 import { movieSummaryQuery } from "../queries";
-import type { MovieCollection, SavedMovie } from "../watchlist.types";
 import { SaveMovieToCollection } from "./SaveMovieToCollection";
 
 type GridProps = { entries: SavedMovie[]; category: MovieCollection };
