@@ -416,11 +416,14 @@ responsive column counts, and the last loaded row.
 
 - `src/features/movies/`: movie components, hooks, types, queries, and collection
   modules. `movie.*` handles public TMDB data; `collection.*` handles private
-  Watchlist/Favorites membership. `CollectionPage`, `MovieRail`, and
-  `MovieSearchResults` describe the UI responsibilities directly.
+  Watchlist/Favorites membership. `MovieRail` and `MovieSearchResults` describe
+  the UI responsibilities directly.
 - `src/features/movies/services/`: TMDB transport (`tmdb-client.server.ts`), movie
   services, card summaries, and collection database access. Server Functions stay
   under the feature's `api/` directory as `*.functions.ts`.
+- `src/pages/`: complete screens: `HomePage`, `CollectionPage` (shared by
+  Watchlist/Favorites), and `MovieDetailsPage`. Routes retain URL definitions,
+  guards, loaders, and search-parameter validation.
 - `src/components/`: reusable controls such as `Badge`, `IconButton`, and
   `BackButton`. Movie-specific presentation components live in the movie feature.
 - Feature helpers live in their feature's `utils/` directory. `src/lib/utils.ts`

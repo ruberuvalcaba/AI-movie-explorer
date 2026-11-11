@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { CollectionPage } from "@/features/movies/components/CollectionPage";
+import { CollectionPage } from "@/pages/CollectionPage";
 
 export const Route = createFileRoute("/watchlist")({
 	beforeLoad: ({ context }) => {

@@ -14,7 +14,7 @@ import { formatRuntime } from "@/features/movies/utils/format-runtime";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
-export const MovieDetails = () => {
+export const MovieDetailsPage = () => {
 	const { movieId } = useParams({
 		from: "/movie/$movieId",
 	});
