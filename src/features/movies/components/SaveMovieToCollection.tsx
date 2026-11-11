@@ -18,12 +18,12 @@ const actionClass =
 const compactClass =
 	"action-button flex cursor-pointer h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60";
 
-export function SaveMovieToCollection({
+export const SaveMovieToCollection = ({
 	movieId,
 	title,
 	compact = false,
 	category,
-}: Props) {
+}: Props) => {
 	const { auth } = RootRoute.useRouteContext();
 	const description = title ?? "this movie";
 	const Icon = category === "favorites" ? Heart : Bookmark;
@@ -50,15 +50,15 @@ export function SaveMovieToCollection({
 			title={description}
 		/>
 	);
-}
+};
 
-function MovieCollectionControl({
+const MovieCollectionControl = ({
 	userId,
 	movieId,
 	compact,
 	category,
 	title,
-}: Props & { userId: string }) {
+}: Props & { userId: string }) => {
 	const movies = useQuery(savedMoviesQuery(userId, category));
 	const add = useAddSavedMovie(userId, category);
 	const remove = useRemoveSavedMovie(userId, category);
@@ -146,4 +146,4 @@ function MovieCollectionControl({
 			)}
 		</div>
 	);
-}
+};

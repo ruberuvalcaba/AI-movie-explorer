@@ -11,7 +11,7 @@ import { SaveMovieToCollection } from "./SaveMovieToCollection";
 const buttonClass =
 	"rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15";
 
-export function MyCollection({ category }: { category: MovieCollection }) {
+export const MyCollection = ({ category }: { category: MovieCollection }) => {
 	const { auth } = RootRoute.useRouteContext();
 	if (!auth.user)
 		return (
@@ -32,15 +32,15 @@ export function MyCollection({ category }: { category: MovieCollection }) {
 			category={category}
 		/>
 	);
-}
+};
 
-function SavedMoviesPage({
+const SavedMoviesPage = ({
 	userId,
 	category,
 }: {
 	userId: string;
 	category: MovieCollection;
-}) {
+}) => {
 	const movies = useQuery(savedMoviesQuery(userId, category));
 	const movieQueries = useQueries({
 		queries: (movies.data ?? []).map((entry) =>
@@ -119,4 +119,4 @@ function SavedMoviesPage({
 			)}
 		</main>
 	);
-}
+};
