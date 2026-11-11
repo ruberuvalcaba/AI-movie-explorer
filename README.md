@@ -389,3 +389,25 @@ For a hosted Supabase project, configure these settings before testing delivery:
 Local Supabase uses the checked-in recovery template/configuration. Hosted
 settings are not updated by editing these files. `npm run test:auth` tests recovery
 with mock Auth endpoints; it does not send email or verify hosted deliverability.
+
+### Large Watchlist / Favorites performance
+
+Collection pages show 24 movies initially, with **Load more movies** revealing
+another 24. Counts and save controls still use the complete membership list.
+Only revealed cards request metadata, using lightweight summaries without trailers.
+Full details and trailers retain their separate query/cache. Previously loaded
+full details can seed a summary, never the reverse.
+
+TanStack Query treats cached summaries as fresh for ten minutes and reuses them
+across Watchlist and Favorites. There is no custom server cache, request queue, or collection grid
+virtualization. The loaded portion is remembered in a user/category-specific
+private query entry when returning from movie details; account cleanup clears it.
+No database schema or hosted configuration changes are required.
+
+Validation: `npm run test:auth`, `npm run test:cache`, `npm run test:search`,
+`npm run test:db`, `npx tsc --noEmit`, and `npm run build`.
+For browser layout tests, use `MOVIE_TEST_BROWSER=1 npm run test:auth`.
+This starts headless Chrome with a temporary profile and local mocked services;
+set `CHROME_PATH` if Chrome is not installed at the default macOS location.
+The browser test checks the first 24 cards, Load more, mobile row spacing,
+responsive column counts, and the last loaded row.

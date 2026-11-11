@@ -1,12 +1,10 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { MovieSectionHeader } from "#/components/MovieSectionHeader";
-import { MovieCard } from "@/components/MovieCard";
 import { Route as RootRoute } from "@/routes/__root";
-import { movieDetailsQuery } from "../queries";
 import { savedMoviesQuery } from "../watchlist.queries";
 import type { MovieCollection } from "../watchlist.types";
-import { SaveMovieToCollection } from "./SaveMovieToCollection";
+import { CollectionMovieGrid } from "./CollectionMovieGrid";
 
 const buttonClass =
 	"rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15";
@@ -27,7 +25,7 @@ export const MyCollection = ({ category }: { category: MovieCollection }) => {
 		);
 	return (
 		<SavedMoviesPage
-			key={auth.user.id}
+			key={`${auth.user.id}:${category}`}
 			userId={auth.user.id}
 			category={category}
 		/>
@@ -42,10 +40,17 @@ const SavedMoviesPage = ({
 	category: MovieCollection;
 }) => {
 	const movies = useQuery(savedMoviesQuery(userId, category));
-	const movieQueries = useQueries({
-		queries: (movies.data ?? []).map((entry) =>
-			movieDetailsQuery(entry.tmdb_movie_id),
-		),
+	const queryClient = useQueryClient();
+	// Keep the loaded portion when returning from movie details; account cleanup
+	// removes this view state together with the user's other private cache entries.
+	const viewKey = ["private", userId, "collectionView", category] as const;
+	const { data: visibleCount } = useQuery({
+		queryKey: viewKey,
+		queryFn: () => 24,
+		initialData: 24,
+		enabled: false,
+		staleTime: Infinity,
+		gcTime: 30 * 60_000,
 	});
 	return (
 		<main className="mx-auto mb-20 mt-36 sm:mt-20 max-w-7xl px-4 pb-20 text-white sm:px-6">
@@ -81,41 +86,30 @@ const SavedMoviesPage = ({
 				</div>
 			)}
 			{Boolean(movies.data?.length) && (
-				<div className="grid grid-cols-3 gap-2 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
-					{movies.data?.map((entry, index) => {
-						const query = movieQueries[index];
-						return query?.data ? (
-							<MovieCard key={entry.tmdb_movie_id} movie={query.data} />
-						) : (
-							<div
-								key={entry.tmdb_movie_id}
-								className="flex min-w-0 flex-col gap-3"
-							>
-								<div className="flex aspect-[2/3] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-sm text-white/60">
-									{query?.isError ? (
-										<>
-											<p>Movie {entry.tmdb_movie_id} is unavailable.</p>
-											<button
-												type="button"
-												className="underline"
-												onClick={() => void query.refetch()}
-											>
-												Retry movie
-											</button>
-										</>
-									) : (
-										<output>Loading movie…</output>
-									)}
-								</div>
-								<SaveMovieToCollection
-									category={category}
-									movieId={entry.tmdb_movie_id}
-									title={`movie ${entry.tmdb_movie_id}`}
-								/>
-							</div>
-						);
-					})}
-				</div>
+				<>
+					<CollectionMovieGrid
+						entries={(movies.data ?? []).slice(0, visibleCount)}
+						category={category}
+					/>
+					<p className="mt-4 text-sm text-white/60" aria-live="polite">
+						Showing {Math.min(visibleCount, movies.data?.length ?? 0)} of{" "}
+						{movies.data?.length} movies
+					</p>
+					{visibleCount < (movies.data?.length ?? 0) && (
+						<button
+							type="button"
+							className={`${buttonClass} mt-4 min-h-11`}
+							onClick={() =>
+								queryClient.setQueryData<number>(
+									viewKey,
+									(count = 24) => count + 24,
+								)
+							}
+						>
+							Load more movies
+						</button>
+					)}
+				</>
 			)}
 		</main>
 	);

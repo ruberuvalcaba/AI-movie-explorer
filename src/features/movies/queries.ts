@@ -6,12 +6,14 @@ import {
 import {
 	getMovieCreditsServerFn,
 	getMovieDetailsServerFn,
+	getMovieSummaryServerFn,
 	getPopularMoviesServerFn,
 	getTopRatedMoviesServerFn,
 	getTrendingMoviesServerFn,
 	getUpcomingMoviesServerFn,
 	searchMoviesServerFn,
 } from "./api/movie.functions";
+
 //Currently unsused quries, but used for: const { data, isPending, error } = useQuery(topRatedMoviesQuery(1));
 //Query options factory
 export const popularMoviesQuery = (page: number) =>
@@ -67,4 +69,13 @@ export const searchMoviesQuery = (title: string) =>
 		getNextPageParam: (lastPage) =>
 			lastPage.page < lastPage.total_pages ? lastPage.page + 1 : undefined,
 		staleTime: 5 * 60 * 1000,
+	});
+
+export const movieSummaryQuery = (movieId: number) =>
+	queryOptions({
+		queryKey: ["movie", movieId, "summary"],
+		queryFn: ({ signal }) =>
+			getMovieSummaryServerFn({ data: { movieId }, signal }),
+		staleTime: 10 * 60_000,
+		retry: 1,
 	});

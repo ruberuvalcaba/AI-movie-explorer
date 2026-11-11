@@ -2,12 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { memo } from "react";
 import { SaveMovieToCollection } from "@/features/movies/components/SaveMovieToCollection";
 import { usePrefetchMovie } from "@/features/movies/hooks/usePrefetchMovie";
-import type { MiniMovie, Movie } from "@/types/movie";
+import type { MiniMovie } from "@/types/movie";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w300";
 
 interface MovieCardProps {
-	movie: Movie;
+	movie: MiniMovie;
 	isMini?: false;
 }
 

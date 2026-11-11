@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getMovieSummary } from "../services/movie-summary.server";
 import {
 	getMovieCredits,
 	getMovieDetails,
@@ -9,7 +10,6 @@ import {
 	getUpcomingMovies,
 	searchMovieByTitle,
 } from "../services.server";
-// import { movieApiServer } from "./movie.server";
 
 export const getPopularMoviesServerFn = createServerFn({
 	method: "GET",
@@ -91,3 +91,9 @@ export const searchMoviesServerFn = createServerFn({ method: "GET" })
 		}),
 	)
 	.handler(async ({ data }) => searchMovieByTitle(data.query, data.page));
+
+export const getMovieSummaryServerFn = createServerFn({ method: "GET" })
+	.validator(
+		z.object({ movieId: z.number().int().positive().max(2_147_483_647) }),
+	)
+	.handler(({ data }) => getMovieSummary(data.movieId));

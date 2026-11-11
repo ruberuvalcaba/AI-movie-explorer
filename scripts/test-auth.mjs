@@ -28,6 +28,8 @@ let passwordUpdates = 0;
 let recoveryStatus = 200;
 let passwordUpdateError = null;
 let latestRecoveryRedirect = '';
+const summaryFetches = new Map();
+let tmdbFailure = false;
 let profileWrites = 0;
 let latestRedirect = '';
 const usedConfirmations = new Set();
@@ -59,7 +61,16 @@ const mock = createServer(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('X-Supabase-Api-Version', '2024-01-01');
   const send = (status, value) => { res.writeHead(status); res.end(JSON.stringify(value)); };
-  if (url.pathname === '/auth/v1/token') {
+  if (/^\/3\/movie\/\d+$/.test(url.pathname)) {
+   const id = Number(url.pathname.split('/').at(-1));
+   const summary = !url.searchParams.has('append_to_response');
+   if (summary) summaryFetches.set(id, (summaryFetches.get(id) ?? 0) + 1);
+   await new Promise(resolve => setTimeout(resolve, 20));
+   if (tmdbFailure) { send(503, { message: 'TMDB unavailable' }); return; }
+   send(200, { id, title: `Movie ${id}`, poster_path: null, release_date: '2026-01-01', vote_average: 7.5,
+    overview: 'Test movie', backdrop_path: null, vote_count: 10, genres: [], original_language: 'en', runtime: 100,
+    videos: { results: [] } });
+  } else if (url.pathname === '/auth/v1/token') {
    const grant = url.searchParams.get('grant_type');
    const current = input.email === otherUser.email || input.refresh_token === `test-refresh-${otherUser.id}` ? otherUser : user;
    if (grant === 'pkce') {
@@ -186,7 +197,7 @@ mock.listen(0, '127.0.0.1'); await once(mock, 'listening');
 const portProbe = createServer(); portProbe.listen(0, '127.0.0.1'); await once(portProbe, 'listening');
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const base = `http://127.0.0.1:${port}`;
-const child = spawn(process.execPath, ['.output/server/index.mjs'], { env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
+const child = spawn(process.execPath, ['--import', './scripts/fixtures/mock-tmdb.mjs', '.output/server/index.mjs'], { env: { ...process.env, TEST_TMDB_URL: `http://127.0.0.1:${mock.address().port}`, TMDB_ACCESS_TOKEN: 'test-only-token', PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
 let output = ''; child.stdout.on('data', chunk => { output += chunk; }); child.stderr.on('data', chunk => { output += chunk; });
 try {
  for (let attempt = 0; ; attempt++) {
@@ -195,7 +206,7 @@ try {
  const assets = 'node_modules/.nitro/vite/services/ssr/assets';
  const ids = {};
  for (const file of await readdir(assets)) {
-  if (!/^(auth.functions|account.functions|profile.functions|watchlist.functions|recovery.functions)-/.test(file)) continue;
+  if (!/^(auth.functions|account.functions|profile.functions|watchlist.functions|recovery.functions|movie.functions)-/.test(file)) continue;
   const source = await readFile(`${assets}/${file}`, 'utf8');
   for (const match of source.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)) ids[match[2]] = match[1];
  }
@@ -365,6 +376,12 @@ try {
  assert.equal((await decode(ownAccount)).result.displayName, 'Movie Fan');
  assert.equal((await decode(anotherAccount)).result.displayName, 'Other User');
  assert.equal(anonymousAccount.status, 401, 'Concurrent anonymous request must stay anonymous');
+ // Cards receive lightweight summaries; full details retain trailers separately.
+ const summaryOptions = movieId => ({ data: { movieId } });
+ const summary = (await decode(await rpc('getMovieSummaryServerFn', summaryOptions(900001)))).result;
+ assert.deepEqual(Object.keys(summary).sort(), ['id', 'poster_path', 'release_date', 'title', 'vote_average']);
+ const fullDetails = (await decode(await rpc('getMovieDetailsServerFn', summaryOptions(900001)))).result;
+ assert.ok(fullDetails.videos && fullDetails.overview, 'Full details still include videos and overview');
  // A user's watchlist is implicit: no setup record or sample import exists.
  const resultOf = async (name, options = {}) => {
   const response = await rpc(name, options);
@@ -381,6 +398,11 @@ try {
    assert.ok(decoded.error || decoded.result?.error, `${name} should reject invalid input`);
   }
  };
+ tmdbFailure = true;
+ await denied('getMovieSummaryServerFn', summaryOptions(900099));
+ tmdbFailure = false;
+ assert.equal((await resultOf('getMovieSummaryServerFn', summaryOptions(900099))).id, 900099, 'Failed summaries are retryable');
+ for (const movieId of [0, -1, 1.5, 2147483648]) await denied('getMovieSummaryServerFn', summaryOptions(movieId));
  for (const obsolete of ['getWatchlists', 'getWatchlistMovies', 'createWatchlist', 'renameWatchlist', 'deleteWatchlist']) {
   assert.equal(ids[obsolete], undefined, `${obsolete} must not remain a callable server function`);
  }
@@ -465,6 +487,16 @@ try {
  // All saved IDs must be returned even when a project caps each result below the
  // server batch size or has more than PostgREST's customary 1000-row maximum.
  await db.query('insert into public.saved_movies (user_id,tmdb_movie_id) select $1,id from generate_series(10000,11002) as id', [user.id]);
+ const largePage = await fetch(`${base}/watchlist`, { headers: { Cookie: newDeviceCookie } });
+ const largeHtml = await largePage.text();
+ assert.equal(largePage.status, 200);
+ assert.ok(largeHtml.includes('My Watchlist'), 'Large collection route still renders');
+ assert.ok(!Array.from(summaryFetches.keys()).some(id => id >= 10024 && id <= 11002), 'First render does not fetch offscreen collection metadata');
+ if (process.env.MOVIE_TEST_BROWSER === '1') {
+  const { testCollectionBrowser } = await import('./fixtures/collection-browser.mjs');
+  const expected = (await db.query("select tmdb_movie_id from public.saved_movies where user_id=$1 and category='watchlist' order by added_at desc,tmdb_movie_id asc limit 72", [user.id])).rows.map(row => row.tmdb_movie_id);
+  await testCollectionBrowser(base, newDeviceCookie, expected);
+ }
  const largeMovies = await resultOf('getSavedMovies', { cookie: newDeviceCookie });
  assert.equal(largeMovies.length, 1005, 'Pagination retrieves all saved movies past row caps');
  assert.equal(new Set(largeMovies.map(movie => movie.tmdb_movie_id)).size, 1005, 'No omitted or duplicate pagination boundaries');
