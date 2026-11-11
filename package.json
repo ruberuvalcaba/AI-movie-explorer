@@ -2,9 +2,6 @@
   "name": "ai-movie-explorer",
   "private": true,
   "type": "module",
-  "imports": {
-    "#/*": "./src/*"
-  },
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
@@ -13,11 +10,12 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "test:auth": "node --test scripts/auth-redirect.test.mjs scripts/password-recovery.test.mjs && node scripts/test-auth.mjs",
+    "test:auth": "node --test tests/unit/auth-redirect.test.mjs tests/unit/password-recovery.test.mjs && node tests/integration/auth.http.test.mjs",
+    "test:voice": "node --test tests/unit/transcription.server.test.mjs",
     "test:db": "node scripts/database.mjs",
     "db:types": "node scripts/database.mjs --types && biome format --write src/integrations/supabase/database.types.ts",
-    "test:cache": "node --test scripts/private-cache.test.mjs",
-    "test:search": "node --test scripts/search-suggestions.test.mjs"
+    "test:cache": "node --test tests/unit/private-cache.test.mjs",
+    "test:search": "node --test tests/unit/search-suggestions.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "^2.4.0",

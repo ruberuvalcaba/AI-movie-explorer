@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { signIn, signUp } from "@/features/auth/api/auth.functions";
+import {
+	credentialsSchema,
+	registrationSchema,
+} from "@/features/auth/auth.schemas";
+import { getSafeRedirect } from "@/features/auth/redirect";
 import { Route } from "@/routes/__root";
-import { signIn, signUp } from "../api/auth.functions";
-import { getSafeRedirect } from "../redirect";
-import { credentialsSchema, registrationSchema } from "../schemas";
 
 export function AuthForm({
 	register = false,

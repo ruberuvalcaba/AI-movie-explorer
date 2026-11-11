@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getMovieSummary } from "../services/movie-summary.server";
 import {
 	getMovieCredits,
 	getMovieDetails,
@@ -9,7 +8,8 @@ import {
 	getTrendingMovies,
 	getUpcomingMovies,
 	searchMovieByTitle,
-} from "../services.server";
+} from "@/features/movies/services/movie.server";
+import { getMovieSummary } from "@/features/movies/services/movie-summary.server";
 
 export const getPopularMoviesServerFn = createServerFn({
 	method: "GET",

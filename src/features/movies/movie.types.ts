@@ -10,7 +10,7 @@ export interface Movie {
 	popularity: number;
 	// Movie details
 	adult: boolean;
-	belongs_to_collection?: MovieCollection | null;
+	belongs_to_collection?: TmdbCollection | null;
 	budget: number;
 	genres: MovieGenre[];
 	homepage: string | null;
@@ -38,7 +38,7 @@ export interface MiniMovie {
 	release_date: string;
 }
 
-export interface MovieCollection {
+export interface TmdbCollection {
 	id: number;
 	name: string;
 	poster_path: string | null;

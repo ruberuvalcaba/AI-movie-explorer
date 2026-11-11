@@ -1,13 +1,16 @@
 import type { AuthError } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { readProfile } from "@/features/profiles/services.server";
+import {
+	credentialsSchema,
+	registrationSchema,
+} from "@/features/auth/auth.schemas";
+import { getSafeRedirect } from "@/features/auth/redirect";
+import { readProfile } from "@/features/profiles/profile.server";
 import {
 	getSupabaseServerClient,
 	isAuthConfigured,
 } from "@/integrations/supabase/server";
-import { getSafeRedirect } from "../redirect";
-import { credentialsSchema, registrationSchema } from "../schemas";
 
 function authErrorMessage(error: AuthError, registering = false): string {
 	if (

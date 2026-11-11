@@ -14,7 +14,7 @@ export const transcribeAudioServerFn = createServerFn({ method: "POST" })
 	)
 	.handler(async ({ data }) => {
 		const { transcribeAudio } = await import(
-			"../services/transcription.server"
+			"@/features/assistant/services/transcription.server"
 		);
 		return transcribeAudio(data);
 	});

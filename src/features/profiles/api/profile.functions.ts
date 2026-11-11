@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireAuth } from "@/features/auth/middleware";
-import { profileInput } from "../schemas";
-import { saveDisplayName } from "../services.server";
+import { requireAuth } from "@/features/auth/auth.middleware";
+import { profileInput } from "@/features/profiles/profile.schemas";
+import { saveDisplayName } from "@/features/profiles/profile.server";
 
 export const updateProfile = createServerFn({ method: "POST" })
 	.middleware([requireAuth])

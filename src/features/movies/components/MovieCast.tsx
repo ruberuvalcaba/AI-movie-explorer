@@ -1,4 +1,4 @@
-import { MovieSpinner } from "#/components/MovieSpinner";
+import { MovieSpinner } from "@/features/movies/components/MovieSpinner";
 
 interface CastMember {
 	id: number;

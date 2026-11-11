@@ -1,8 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { requireAuth } from "@/features/auth/auth.middleware";
+import {
+	passwordResetSchema,
+	recoveryEmailSchema,
+} from "@/features/auth/auth.schemas";
 import { getSupabaseServerClient } from "@/integrations/supabase/server";
-import { requireAuth } from "../middleware";
-import { passwordResetSchema, recoveryEmailSchema } from "../schemas";
 
 export const requestPasswordRecovery = createServerFn({ method: "POST" })
 	.validator(recoveryEmailSchema)

@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type {
+	MovieCollection,
+	SavedMovie,
+} from "@/features/movies/collection.types";
 import type { Database } from "@/integrations/supabase/database.types";
-import type { MovieCollection, SavedMovie } from "../collection.types";
 
 type Client = SupabaseClient<Database>;
 

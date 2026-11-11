@@ -4,7 +4,7 @@ import {
 	setCookie,
 	setResponseHeader,
 } from "@tanstack/react-start/server";
-import type { Database } from "./database.types";
+import type { Database } from "@/integrations/supabase/database.types";
 
 export function isAuthConfigured() {
 	return Boolean(

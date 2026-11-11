@@ -1,9 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MovieCard } from "#/components/MovieCard";
-import type { MiniMovie } from "#/types/movie";
-import type { MovieCollection, SavedMovie } from "../collection.types";
-import { movieSummaryQuery } from "../queries";
-import { SaveMovieToCollection } from "./SaveMovieToCollection";
+import type {
+	MovieCollection,
+	SavedMovie,
+} from "@/features/movies/collection.types";
+import { MovieCard } from "@/features/movies/components/MovieCard";
+import { SaveMovieToCollection } from "@/features/movies/components/SaveMovieToCollection";
+import { movieSummaryQuery } from "@/features/movies/movie.queries";
+import type { MiniMovie } from "@/features/movies/movie.types";
 
 type GridProps = { entries: SavedMovie[]; category: MovieCollection };
 const gridClass =

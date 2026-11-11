@@ -2,9 +2,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { House, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { searchMoviesQuery } from "../queries";
-import { registerSuggestionDismissal } from "../search-suggestions.events";
-import { MovieSearchSuggestions } from "./MovieSearchSuggestions";
+import { MovieSearchSuggestions } from "@/features/movies/components/MovieSearchSuggestions";
+import { searchMoviesQuery } from "@/features/movies/movie.queries";
+import { registerSuggestionDismissal } from "@/features/movies/search-suggestions.events";
 
 export const MovieSearchBar = () => {
 	const navigate = useNavigate();

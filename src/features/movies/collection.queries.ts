@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getSavedMovies } from "./api/collection.functions";
+import { getSavedMovies } from "@/features/movies/api/collection.functions";
 
-import type { MovieCollection } from "./collection.types";
+import type { MovieCollection } from "@/features/movies/collection.types";
 
 export const savedMovieKeys = {
 	all: (userId: string | undefined, category: MovieCollection) =>

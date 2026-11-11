@@ -1,8 +1,8 @@
-import type { MiniMovie } from "#/types/movie";
-import { movieApiServer } from "../api/movie.server";
+import type { MiniMovie } from "@/features/movies/movie.types";
+import { fetchTmdb } from "@/features/movies/services/tmdb-client.server";
 
 export async function getMovieSummary(movieId: number): Promise<MiniMovie> {
-	const movie = await movieApiServer<MiniMovie>(
+	const movie = await fetchTmdb<MiniMovie>(
 		`/movie/${movieId}`,
 		{ language: "en-US" },
 		AbortSignal.timeout(15_000),

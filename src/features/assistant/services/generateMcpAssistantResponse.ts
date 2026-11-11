@@ -1,9 +1,8 @@
 import { chat } from "@tanstack/ai";
 import { geminiText } from "@tanstack/ai-gemini";
-
-import { createMovieMcpClient } from "#/mcp/mcp-client";
-import type { AssistantContext } from "../types/assistantContext";
-import { mcpAssistantResponseSchema } from "../types/mcpAssistantResponse";
+import type { AssistantContext } from "@/features/assistant/types/assistantContext";
+import { mcpAssistantResponseSchema } from "@/features/assistant/types/mcpAssistantResponse";
+import { createMovieMcpClient } from "@/mcp/mcp-client.server";
 
 interface Params {
 	userMessage: string;

@@ -1,11 +1,11 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearch } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { MovieCard } from "#/components/MovieCard";
-import { MovieSectionHeader } from "#/components/MovieSectionHeader";
-import { searchMoviesQuery } from "../queries";
+import { MovieCard } from "@/features/movies/components/MovieCard";
+import { MovieSectionHeader } from "@/features/movies/components/MovieSectionHeader";
+import { searchMoviesQuery } from "@/features/movies/movie.queries";
 
-export const MovieSearch = ({ children }: { children: ReactNode }) => {
+export const MovieSearchResults = ({ children }: { children: ReactNode }) => {
 	const { q } = useSearch({ from: "/" });
 	const query = q ?? "";
 	const {

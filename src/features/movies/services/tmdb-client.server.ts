@@ -1,6 +1,6 @@
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
-export const movieApiServer = async <T>(
+export const fetchTmdb = async <T>(
 	endpoint: string,
 	params?: Record<string, string>,
 	signal?: AbortSignal,

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { readProfile } from "@/features/profiles/services.server";
-import { requireAuth } from "../middleware";
+import { requireAuth } from "@/features/auth/auth.middleware";
+import { readProfile } from "@/features/profiles/profile.server";
 
 export const getAccount = createServerFn({ method: "GET" })
 	.middleware([requireAuth])

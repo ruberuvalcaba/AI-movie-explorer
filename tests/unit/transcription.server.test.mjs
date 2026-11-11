@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { transcribeAudio } from "./transcription.server.ts";
+import { transcribeAudio } from "../../src/features/assistant/services/transcription.server.ts";
 
 const originalFetch = globalThis.fetch;
 const originalGoogleKey = process.env.GOOGLE_API_KEY;

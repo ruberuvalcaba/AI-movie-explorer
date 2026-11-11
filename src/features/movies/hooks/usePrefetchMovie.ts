@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
-import { movieDetailsQuery } from "../queries";
+import { movieDetailsQuery } from "@/features/movies/movie.queries";
 
 export const usePrefetchMovie = (movieId: number) => {
 	const queryClient = useQueryClient();

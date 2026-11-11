@@ -1,15 +1,15 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { MovieSectionHeader } from "#/components/MovieSectionHeader";
+import { savedMoviesQuery } from "@/features/movies/collection.queries";
+import type { MovieCollection } from "@/features/movies/collection.types";
+import { CollectionMovieGrid } from "@/features/movies/components/CollectionMovieGrid";
+import { MovieSectionHeader } from "@/features/movies/components/MovieSectionHeader";
 import { Route as RootRoute } from "@/routes/__root";
-import { savedMoviesQuery } from "../collection.queries";
-import type { MovieCollection } from "../collection.types";
-import { CollectionMovieGrid } from "./CollectionMovieGrid";
 
 const buttonClass =
 	"rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15";
 
-export const MyCollection = ({ category }: { category: MovieCollection }) => {
+export const CollectionPage = ({ category }: { category: MovieCollection }) => {
 	const { auth } = RootRoute.useRouteContext();
 	if (!auth.user)
 		return (
@@ -24,7 +24,7 @@ export const MyCollection = ({ category }: { category: MovieCollection }) => {
 			</main>
 		);
 	return (
-		<SavedMoviesPage
+		<CollectionContent
 			key={`${auth.user.id}:${category}`}
 			userId={auth.user.id}
 			category={category}
@@ -32,7 +32,7 @@ export const MyCollection = ({ category }: { category: MovieCollection }) => {
 	);
 };
 
-const SavedMoviesPage = ({
+const CollectionContent = ({
 	userId,
 	category,
 }: {

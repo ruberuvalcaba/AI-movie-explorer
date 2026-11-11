@@ -3,11 +3,11 @@ import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { Edit, EllipsisVertical, LogOut } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import { useEffect, useState } from "react";
+import { signOut } from "@/features/auth/api/auth.functions";
+import { getSafeRedirect } from "@/features/auth/redirect";
 import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { clearPrivateCache } from "@/integrations/tanstack-query/private-cache";
 import { Route } from "@/routes/__root";
-import { signOut } from "../api/auth.functions";
-import { getSafeRedirect } from "../redirect";
 
 export function AccountMenu() {
 	const { auth } = Route.useRouteContext();

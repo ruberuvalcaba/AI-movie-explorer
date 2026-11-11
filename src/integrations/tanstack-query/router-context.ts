@@ -1,6 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 
-export function getContext() {
+export function createRouterContext() {
 	const queryClient = new QueryClient();
 
 	return {
@@ -12,4 +12,3 @@ export function getContext() {
 		>,
 	};
 }
-export default function TanstackQueryProvider() {}

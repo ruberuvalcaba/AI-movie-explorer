@@ -1,6 +1,6 @@
 import { ArrowUp, Mic, Square } from "lucide-react";
 import { useState } from "react";
-import { useVoiceInput } from "../hooks/useVoiceInput";
+import { useVoiceInput } from "@/features/assistant/hooks/useVoiceInput";
 
 interface ChatInputProps {
 	onSubmit: (message: string) => void;

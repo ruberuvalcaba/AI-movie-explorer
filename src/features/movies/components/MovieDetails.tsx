@@ -1,13 +1,16 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { Clock, Star } from "lucide-react";
-import { MovieSpinner } from "#/components/MovieSpinner";
-import { PillContainer } from "#/components/PillContainer";
-import { formatRuntime } from "../../../utils";
-import { movieCreditsQuery, movieDetailsQuery } from "../queries";
-import { MovieCast } from "./MovieCast";
-import { MovieTrailer } from "./MovieTrailer";
-import { SaveMovieToCollection } from "./SaveMovieToCollection";
+import { Badge } from "@/components/Badge";
+import { MovieCast } from "@/features/movies/components/MovieCast";
+import { MovieSpinner } from "@/features/movies/components/MovieSpinner";
+import { MovieTrailer } from "@/features/movies/components/MovieTrailer";
+import { SaveMovieToCollection } from "@/features/movies/components/SaveMovieToCollection";
+import {
+	movieCreditsQuery,
+	movieDetailsQuery,
+} from "@/features/movies/movie.queries";
+import { formatRuntime } from "@/features/movies/utils/format-runtime";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w1280";
 
@@ -151,12 +154,12 @@ export const MovieDetails = () => {
 
 							{/* Bottom info */}
 							<div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
-								<PillContainer
+								<Badge
 									label={formatRuntime(movie.runtime ?? 0)}
 									icon={<Clock size={15} />}
 								/>
 								{movie.genres.map((genre) => (
-									<PillContainer key={genre.id} label={genre.name} />
+									<Badge key={genre.id} label={genre.name} />
 								))}
 							</div>
 						</div>

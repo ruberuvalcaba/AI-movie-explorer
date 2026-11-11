@@ -1,11 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireAuth } from "@/features/auth/middleware";
-import { collectionInput, savedMovieInput } from "../collection.schemas";
+import { requireAuth } from "@/features/auth/auth.middleware";
+import {
+	collectionInput,
+	savedMovieInput,
+} from "@/features/movies/collection.schemas";
 import {
 	destroySavedMovie,
 	insertSavedMovie,
 	readSavedMovies,
-} from "../services/collection.server";
+} from "@/features/movies/services/collection.server";
 
 export const getSavedMovies = createServerFn({ method: "GET" })
 	.middleware([requireAuth])

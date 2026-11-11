@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { passwordResetSchema, recoveryEmailSchema } from '../src/features/auth/schemas.ts';
+import { passwordResetSchema, recoveryEmailSchema } from '../../src/features/auth/auth.schemas.ts';
 
 test('recovery accepts a normalized email without caller-controlled redirects', () => {
  assert.deepEqual(recoveryEmailSchema.parse({ email: ' user@example.com ', redirect: 'https://other.example' }), { email: 'user@example.com' });

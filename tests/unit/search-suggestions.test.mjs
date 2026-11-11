@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { registerSuggestionDismissal } from '../src/features/movies/search-suggestions.events.ts';
+import { registerSuggestionDismissal } from '../../src/features/movies/search-suggestions.events.ts';
 
 function setup() {
  const document = new EventTarget();

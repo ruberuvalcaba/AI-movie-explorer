@@ -1,6 +1,6 @@
 import { Play, X } from "lucide-react";
 import { Dialog } from "radix-ui";
-import type { MovieVideo } from "#/types/movie";
+import type { MovieVideo } from "@/features/movies/movie.types";
 
 type MovieTrailerProps = {
 	movieTitle: string;

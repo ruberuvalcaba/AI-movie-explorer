@@ -4,9 +4,9 @@ import {
 } from "@tanstack/ai";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { enrichMcpResponseStream } from "#/features/assistant/services/enrichMcpResponseStream";
-import { generateMcpAssistantResponse } from "#/features/assistant/services/generateMcpAssistantResponse";
-import type { AssistantContext } from "#/features/assistant/types/assistantContext";
+import { enrichMcpResponseStream } from "@/features/assistant/services/enrichMcpResponseStream";
+import { generateMcpAssistantResponse } from "@/features/assistant/services/generateMcpAssistantResponse";
+import type { AssistantContext } from "@/features/assistant/types/assistantContext";
 
 type UserMessage =
 	| {

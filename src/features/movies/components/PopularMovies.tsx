@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { MovieSpinner } from "#/components/MovieSpinner";
-import { MovieContainer } from "@/components/MovieContainer";
-import { MovieSectionHeader } from "@/components/MovieSectionHeader";
-import { getPopularMoviesServerFn } from "../api/movie.functions";
-import { usePaginatedFetch } from "../hooks/usePaginatedFetch";
+import { getPopularMoviesServerFn } from "@/features/movies/api/movie.functions";
+import { MovieRail } from "@/features/movies/components/MovieRail";
+import { MovieSectionHeader } from "@/features/movies/components/MovieSectionHeader";
+import { MovieSpinner } from "@/features/movies/components/MovieSpinner";
+import { usePaginatedFetch } from "@/features/movies/hooks/usePaginatedFetch";
 
 export const PopularMovies = () => {
 	const {
@@ -37,7 +37,7 @@ export const PopularMovies = () => {
 				count={`${movies?.length}+`}
 				displayArrow={true}
 			/>
-			<MovieContainer
+			<MovieRail
 				movies={movies}
 				fetchNextPage={fetchNextPage}
 				isFetchingNextPage={isFetchingNextPage}

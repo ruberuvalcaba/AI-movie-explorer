@@ -8,17 +8,17 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Bookmark, Heart } from "lucide-react";
-import { BackButton } from "#/components/BackButton";
-import { IconButton } from "#/components/IconButton";
-import { MovieSearchBar } from "#/features/movies/components/MovieSearchBar";
+import { BackButton } from "@/components/BackButton";
 import { HomeButton } from "@/components/HomeButton";
+import { IconButton } from "@/components/IconButton";
 import { MovieAssistant } from "@/features/assistant/components/MovieAssistant";
 import { getAuthStatus } from "@/features/auth/api/auth.functions";
 import { AccountMenu } from "@/features/auth/components/AccountMenu";
 import { savedMoviesQuery } from "@/features/movies/collection.queries";
+import { MovieSearchBar } from "@/features/movies/components/MovieSearchBar";
+import TanStackQueryDevtools from "@/integrations/tanstack-query/devtools";
 import { clearPrivateCache } from "@/integrations/tanstack-query/private-cache";
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-import appCss from "../styles.css?url";
+import appCss from "@/styles.css?url";
 
 interface MyRouterContext {
 	queryClient: QueryClient;

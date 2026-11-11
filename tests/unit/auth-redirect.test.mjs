@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { authSearch, getSafeRedirect } from '../src/features/auth/redirect.ts';
+import { authSearch, getSafeRedirect } from '../../src/features/auth/redirect.ts';
 
 test('auth return destination defaults to Home and preserves in-app URLs', () => {
  for (const value of [undefined, null, '', 42]) assert.equal(getSafeRedirect(value), '/');

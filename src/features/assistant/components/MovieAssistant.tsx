@@ -2,11 +2,11 @@ import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
 import { useLocation } from "@tanstack/react-router";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { MovieCard } from "#/components/MovieCard";
-import { assistantResponseSchema } from "#/features/assistant/types/assistantResponse";
-import { formatAiError } from "../../../utils";
-import { ChatInput } from "./ChatInput";
-import { ChatMessage } from "./ChatMessage";
+import { ChatInput } from "@/features/assistant/components/ChatInput";
+import { ChatMessage } from "@/features/assistant/components/ChatMessage";
+import { assistantResponseSchema } from "@/features/assistant/types/assistantResponse";
+import { formatAssistantError } from "@/features/assistant/utils/format-assistant-error";
+import { MovieCard } from "@/features/movies/components/MovieCard";
 
 export const MovieAssistant = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -96,7 +96,7 @@ export const MovieAssistant = () => {
 						})}
 
 						{error && (
-							<ChatMessage key="error" content={formatAiError(error)} />
+							<ChatMessage key="error" content={formatAssistantError(error)} />
 						)}
 
 						{isLoading && (

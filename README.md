@@ -118,7 +118,7 @@ Microphone recording requires HTTPS or localhost and a browser with MediaRecorde
 Run the mocked transcription tests with Node 24:
 
 ```sh
-node --test src/features/assistant/services/transcription.server.test.mjs
+node --test tests/unit/transcription.server.test.mjs
 ```
 
 ## ⚡ Performance
@@ -411,3 +411,27 @@ This starts headless Chrome with a temporary profile and local mocked services;
 set `CHROME_PATH` if Chrome is not installed at the default macOS location.
 The browser test checks the first 24 cards, Load more, mobile row spacing,
 responsive column counts, and the last loaded row.
+
+### Source layout and naming
+
+- `src/features/movies/`: movie components, hooks, types, queries, and collection
+  modules. `movie.*` handles public TMDB data; `collection.*` handles private
+  Watchlist/Favorites membership. `CollectionPage`, `MovieRail`, and
+  `MovieSearchResults` describe the UI responsibilities directly.
+- `src/features/movies/services/`: TMDB transport (`tmdb-client.server.ts`), movie
+  services, card summaries, and collection database access. Server Functions stay
+  under the feature's `api/` directory as `*.functions.ts`.
+- `src/components/`: reusable controls such as `Badge`, `IconButton`, and
+  `BackButton`. Movie-specific presentation components live in the movie feature.
+- Feature helpers live in their feature's `utils/` directory. `src/lib/utils.ts`
+  remains the shadcn class-name helper. Source imports use the `@/` alias.
+- `src/mcp/`: server-only MCP client and HTTP transport helpers.
+- `src/integrations/tanstack-query/router-context.ts`: creates the router's
+  request-specific QueryClient/context; it is not a React provider component.
+- `tests/unit/`, `tests/integration/`, `tests/browser/`, and `tests/fixtures/`:
+  automated tests and mocks. Operational database tooling stays in `scripts/`.
+  Run voice transcription tests with `npm run test:voice`.
+
+The TMDB franchise/group type is `TmdbCollection`; the private collection category
+remains `MovieCollection` in `collection.types.ts`. Router filenames and applied
+SQL migration filenames follow their existing framework/history conventions.

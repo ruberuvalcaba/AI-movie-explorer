@@ -197,7 +197,7 @@ mock.listen(0, '127.0.0.1'); await once(mock, 'listening');
 const portProbe = createServer(); portProbe.listen(0, '127.0.0.1'); await once(portProbe, 'listening');
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const base = `http://127.0.0.1:${port}`;
-const child = spawn(process.execPath, ['--import', './scripts/fixtures/mock-tmdb.mjs', '.output/server/index.mjs'], { env: { ...process.env, TEST_TMDB_URL: `http://127.0.0.1:${mock.address().port}`, TMDB_ACCESS_TOKEN: 'test-only-token', PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
+const child = spawn(process.execPath, ['--import', './tests/fixtures/mock-tmdb.mjs', '.output/server/index.mjs'], { env: { ...process.env, TEST_TMDB_URL: `http://127.0.0.1:${mock.address().port}`, TMDB_ACCESS_TOKEN: 'test-only-token', PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
 let output = ''; child.stdout.on('data', chunk => { output += chunk; }); child.stderr.on('data', chunk => { output += chunk; });
 try {
  for (let attempt = 0; ; attempt++) {
@@ -493,7 +493,7 @@ try {
  assert.ok(largeHtml.includes('My Watchlist'), 'Large collection route still renders');
  assert.ok(!Array.from(summaryFetches.keys()).some(id => id >= 10024 && id <= 11002), 'First render does not fetch offscreen collection metadata');
  if (process.env.MOVIE_TEST_BROWSER === '1') {
-  const { testCollectionBrowser } = await import('./fixtures/collection-browser.mjs');
+  const { testCollectionBrowser } = await import('../browser/collection.browser.mjs');
   const expected = (await db.query("select tmdb_movie_id from public.saved_movies where user_id=$1 and category='watchlist' order by added_at desc,tmdb_movie_id asc limit 72", [user.id])).rows.map(row => row.tmdb_movie_id);
   await testCollectionBrowser(base, newDeviceCookie, expected);
  }

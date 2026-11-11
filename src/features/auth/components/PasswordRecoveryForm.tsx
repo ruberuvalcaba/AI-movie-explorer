@@ -1,11 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Route } from "@/routes/__root";
 import {
 	requestPasswordRecovery,
 	resetPassword,
-} from "../api/recovery.functions";
-import { passwordResetSchema, recoveryEmailSchema } from "../schemas";
+} from "@/features/auth/api/recovery.functions";
+import {
+	passwordResetSchema,
+	recoveryEmailSchema,
+} from "@/features/auth/auth.schemas";
+import { Route } from "@/routes/__root";
 
 export function PasswordRecoveryForm({
 	reset = false,

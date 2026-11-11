@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addSavedMovie, removeSavedMovie } from "./api/collection.functions";
-import { savedMovieKeys } from "./collection.queries";
-import type { MovieCollection } from "./collection.types";
+import {
+	addSavedMovie,
+	removeSavedMovie,
+} from "@/features/movies/api/collection.functions";
+import { savedMovieKeys } from "@/features/movies/collection.queries";
+import type { MovieCollection } from "@/features/movies/collection.types";
 
 export function useAddSavedMovie(userId: string, category: MovieCollection) {
 	const queryClient = useQueryClient();

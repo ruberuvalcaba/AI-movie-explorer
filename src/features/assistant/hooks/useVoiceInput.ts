@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { transcribeAudioServerFn } from "../api/transcription.functions";
+import { transcribeAudioServerFn } from "@/features/assistant/api/transcription.functions";
 
 type Status = "idle" | "requesting" | "recording" | "transcribing";
 const MAX_BYTES = 2 * 1024 * 1024;

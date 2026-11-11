@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { updateProfile } from "../api/profile.functions";
-import { profileInput } from "../schemas";
+import { updateProfile } from "@/features/profiles/api/profile.functions";
+import { profileInput } from "@/features/profiles/profile.schemas";
 
 type Props = {
 	userId: string;

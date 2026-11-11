@@ -12,7 +12,7 @@ import {
 	getTrendingMoviesServerFn,
 	getUpcomingMoviesServerFn,
 	searchMoviesServerFn,
-} from "./api/movie.functions";
+} from "@/features/movies/api/movie.functions";
 
 //Currently unsused quries, but used for: const { data, isPending, error } = useQuery(topRatedMoviesQuery(1));
 //Query options factory

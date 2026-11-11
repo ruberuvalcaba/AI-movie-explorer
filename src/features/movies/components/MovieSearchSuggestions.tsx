@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { MiniMovie } from "#/types/movie";
+import type { MiniMovie } from "@/features/movies/movie.types";
 
 interface MovieSearchSuggestionsProps {
 	movies: MiniMovie[];

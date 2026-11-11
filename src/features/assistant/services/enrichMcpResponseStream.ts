@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { generateMcpAssistantResponse } from "./generateMcpAssistantResponse";
+import type { generateMcpAssistantResponse } from "@/features/assistant/services/generateMcpAssistantResponse";
 
 const recommendationsSchema = z.object({
 	movies: z.array(

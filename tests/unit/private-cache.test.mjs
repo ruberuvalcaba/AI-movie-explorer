@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { QueryClient, isCancelledError } from '@tanstack/react-query';
-import { clearPrivateCache } from '../src/integrations/tanstack-query/private-cache.ts';
+import { clearPrivateCache } from '../../src/integrations/tanstack-query/private-cache.ts';
 
 const client = () => new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity }, mutations: { retry: false, gcTime: Infinity } } });
 

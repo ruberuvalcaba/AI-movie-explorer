@@ -1,10 +1,10 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef, useState } from "react";
-import { MovieCard } from "@/components/MovieCard";
 import { Spinner } from "@/components/ui/spinner";
-import type { Movie } from "@/types/movie";
+import { MovieCard } from "@/features/movies/components/MovieCard";
+import type { Movie } from "@/features/movies/movie.types";
 
-interface MovieContainerProps {
+interface MovieRailProps {
 	movies: Movie[];
 	fetchNextPage: () => Promise<unknown>;
 	hasNextPage: boolean;
@@ -13,12 +13,12 @@ interface MovieContainerProps {
 const CARD_WIDTH = 250;
 const GAP = 20;
 
-export const MovieContainer = ({
+export const MovieRail = ({
 	movies = [],
 	fetchNextPage,
 	isFetchingNextPage,
 	hasNextPage,
-}: MovieContainerProps) => {
+}: MovieRailProps) => {
 	// const loadMoreRef = useRef<HTMLDivElement>(null); //If using infinit srolling with IntersectionObserver
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [cardWidth, setCardWidth] = useState(CARD_WIDTH);

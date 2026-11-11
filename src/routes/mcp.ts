@@ -6,8 +6,8 @@ import {
 	getMovieDetails,
 	getMovieRecommendations,
 	searchMovieByTitle,
-} from "#/features/movies/services.server";
-import { handleMcpRequest } from "#/utils/mcp-handler";
+} from "@/features/movies/services/movie.server";
+import { handleMcpRequest } from "@/mcp/mcp-handler.server";
 
 const isAuthorized = (request: Request): boolean => {
 	const token = process.env.MCP_TOKEN;
