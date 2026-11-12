@@ -438,3 +438,26 @@ responsive column counts, and the last loaded row.
 The TMDB franchise/group type is `TmdbCollection`; the private collection category
 remains `MovieCollection` in `collection.types.ts`. Router filenames and applied
 SQL migration filenames follow their existing framework/history conventions.
+
+### Where to Watch
+
+Movie details request `append_to_response=videos,watch/providers`, preserving
+trailers and adding regional availability to the existing details query. No
+separate provider request or query is created. Collection-card summaries remain
+lightweight and do not fetch watch providers.
+
+`MovieWatchProviders` defaults to `region="US"`; callers can pass another country
+code without changing the request, since TMDB returns all available regions.
+The section sorts each non-empty Stream/Free/Free with ads/Rent/Buy group by TMDB
+display priority. Missing regional data shows an empty-state message; missing or
+failed logos use a text fallback. Provider names remain visible.
+
+The watch-options link uses the regional URL supplied by TMDB and opens a new
+tab. Provider-specific playback links are not available. JustWatch attribution
+is displayed in the section. Availability depends on TMDB/JustWatch data and may
+change. See [TMDB's watch-provider documentation](https://developer.themoviedb.org/reference/movie-watch-providers).
+
+Run `npm run test:providers` for grouping tests. The optional headless Chrome suite
+(`MOVIE_TEST_BROWSER=1 npm run test:auth`) also covers availability categories,
+links, logo loading/failures, responsive layouts, and missing-data states using
+local fixtures rather than live streaming-provider availability.

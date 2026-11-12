@@ -5,6 +5,7 @@ import { Badge } from "@/components/Badge";
 import { MovieCast } from "@/features/movies/components/MovieCast";
 import { MovieSpinner } from "@/features/movies/components/MovieSpinner";
 import { MovieTrailer } from "@/features/movies/components/MovieTrailer";
+import { MovieWatchProviders } from "@/features/movies/components/MovieWatchProviders";
 import { SaveMovieToCollection } from "@/features/movies/components/SaveMovieToCollection";
 import {
 	movieCreditsQuery,
@@ -165,6 +166,10 @@ export const MovieDetailsPage = () => {
 						</div>
 					</div>
 				</div>
+				<MovieWatchProviders
+					key={movie.id}
+					watchProviders={movie["watch/providers"]}
+				/>
 				<MovieCast cast={cast?.cast ?? []} isLoading={isCreditsPending} />
 			</div>
 		</div>

@@ -8,6 +8,7 @@ import { once } from 'node:events';
 import { PGlite } from '@electric-sql/pglite';
 import { defaultSerovalDeserializerPlugins } from '@tanstack/react-start';
 import { toJSON, fromCrossJSON } from 'seroval';
+import { watchProviderFixture } from '../fixtures/watch-providers.mjs';
 
 const user = { id: '11111111-1111-4111-8111-111111111111', email: 'test@example.com', aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: new Date().toISOString() };
 const otherUser = { ...user, id: '22222222-2222-4222-8222-222222222222', email: 'other@example.com' };
@@ -29,6 +30,8 @@ let recoveryStatus = 200;
 let passwordUpdateError = null;
 let latestRecoveryRedirect = '';
 const summaryFetches = new Map();
+const detailFetches = new Map();
+let separateWatchProviderRequests = 0;
 let tmdbFailure = false;
 let profileWrites = 0;
 let latestRedirect = '';
@@ -65,11 +68,21 @@ const mock = createServer(async (req, res) => {
    const id = Number(url.pathname.split('/').at(-1));
    const summary = !url.searchParams.has('append_to_response');
    if (summary) summaryFetches.set(id, (summaryFetches.get(id) ?? 0) + 1);
+   else {
+    detailFetches.set(id, (detailFetches.get(id) ?? 0) + 1);
+    assert.deepEqual(url.searchParams.get('append_to_response').split(','), ['videos', 'watch/providers'], 'Details append availability and preserve videos in one request');
+   }
    await new Promise(resolve => setTimeout(resolve, 20));
    if (tmdbFailure) { send(503, { message: 'TMDB unavailable' }); return; }
    send(200, { id, title: `Movie ${id}`, poster_path: null, release_date: '2026-01-01', vote_average: 7.5,
     overview: 'Test movie', backdrop_path: null, vote_count: 10, genres: [], original_language: 'en', runtime: 100,
-    videos: { results: [] } });
+    videos: { results: [] },
+    ...(!summary ? { 'watch/providers': watchProviderFixture(id) } : {}) });
+  } else if (/^\/3\/movie\/\d+\/credits$/.test(url.pathname)) {
+   send(200, { cast: [], crew: [] });
+  } else if (/^\/3\/movie\/\d+\/watch\/providers$/.test(url.pathname)) {
+   separateWatchProviderRequests++;
+   send(500, { message: 'Watch providers must be appended, not fetched separately' });
   } else if (url.pathname === '/auth/v1/token') {
    const grant = url.searchParams.get('grant_type');
    const current = input.email === otherUser.email || input.refresh_token === `test-refresh-${otherUser.id}` ? otherUser : user;
@@ -382,6 +395,9 @@ try {
  assert.deepEqual(Object.keys(summary).sort(), ['id', 'poster_path', 'release_date', 'title', 'vote_average']);
  const fullDetails = (await decode(await rpc('getMovieDetailsServerFn', summaryOptions(900001)))).result;
  assert.ok(fullDetails.videos && fullDetails.overview, 'Full details still include videos and overview');
+ assert.equal(fullDetails['watch/providers'].results.US.flatrate[0].provider_name, 'Netflix', 'Availability is appended to movie details');
+ assert.equal(detailFetches.get(900001), 1, 'Details and watch providers share one TMDB request');
+ assert.equal(separateWatchProviderRequests, 0);
  // A user's watchlist is implicit: no setup record or sample import exists.
  const resultOf = async (name, options = {}) => {
   const response = await rpc(name, options);
@@ -496,6 +512,10 @@ try {
   const { testCollectionBrowser } = await import('../browser/collection.browser.mjs');
   const expected = (await db.query("select tmdb_movie_id from public.saved_movies where user_id=$1 and category='watchlist' order by added_at desc,tmdb_movie_id asc limit 72", [user.id])).rows.map(row => row.tmdb_movie_id);
   await testCollectionBrowser(base, newDeviceCookie, expected);
+  for (const id of [910001, 910002, 910003, 910004, 910005, 910006]) {
+   assert.equal(detailFetches.get(id), 1, 'Each browser movie page uses one cached details request with providers');
+  }
+  assert.equal(separateWatchProviderRequests, 0, 'Browser never requests watch providers separately');
  }
  const largeMovies = await resultOf('getSavedMovies', { cookie: newDeviceCookie });
  assert.equal(largeMovies.length, 1005, 'Pagination retrieves all saved movies past row caps');

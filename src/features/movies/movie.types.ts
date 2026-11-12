@@ -28,6 +28,7 @@ export interface Movie {
 	tagline: string | null;
 	video: boolean;
 	videos?: { results: MovieVideo[] };
+	"watch/providers"?: WatchProvidersResponse | null;
 }
 
 export interface MiniMovie {
@@ -101,4 +102,25 @@ export interface MovieVideo {
 	site: string;
 	type: string;
 	official: boolean;
+}
+
+export interface WatchProvider {
+	provider_id: number;
+	provider_name: string;
+	logo_path: string | null;
+	display_priority: number;
+}
+
+export interface WatchAvailability {
+	link?: string;
+	flatrate?: WatchProvider[];
+	free?: WatchProvider[];
+	ads?: WatchProvider[];
+	rent?: WatchProvider[];
+	buy?: WatchProvider[];
+}
+
+export interface WatchProvidersResponse {
+	id: number;
+	results: Record<string, WatchAvailability>;
 }

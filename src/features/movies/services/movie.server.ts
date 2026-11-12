@@ -36,7 +36,7 @@ export const getUpcomingMovies = (page: number): Promise<MovieResponse> => {
 export const getMovieDetails = (movieId: number): Promise<Movie> => {
 	return fetchTmdb<Movie>(`/movie/${movieId}`, {
 		language: "en-US",
-		append_to_response: "videos",
+		append_to_response: "videos,watch/providers",
 	});
 };
 export const getMovieCredits = async (movieId: number) => {
