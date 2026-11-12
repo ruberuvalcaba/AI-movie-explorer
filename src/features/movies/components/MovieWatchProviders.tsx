@@ -32,7 +32,7 @@ function ProviderLogo({ provider }: { provider: WatchProvider }) {
 			loading="lazy"
 			decoding="async"
 			onError={() => setFailed(true)}
-			className="h-11 w-11 rounded-lg object-contain"
+			className="h-11 w-11 rounded-lg object-contain grayscale"
 		/>
 	);
 }
@@ -68,20 +68,17 @@ export function MovieWatchProviders({ watchProviders, region = "US" }: Props) {
 							</h3>
 							<ul
 								aria-label={`${group.label} providers`}
-								className="flex flex-wrap gap-x-4 gap-y-3"
+								className="flex flex-wrap gap-x-5 gap-y-3"
 							>
 								{group.providers.map((provider) => (
 									<li
 										key={provider.provider_id}
-										className="flex w-20 min-w-0 flex-col items-center gap-2 text-center"
+										className="flex min-w-0 flex-col items-center gap-2 text-center"
 									>
 										<ProviderLogo
 											key={`${provider.provider_id}:${provider.logo_path}`}
 											provider={provider}
 										/>
-										<span className="w-full break-words text-xs leading-4 text-white/75">
-											{provider.provider_name}
-										</span>
 									</li>
 								))}
 							</ul>
