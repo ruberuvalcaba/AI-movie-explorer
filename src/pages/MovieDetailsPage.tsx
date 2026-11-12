@@ -61,7 +61,12 @@ export const MovieDetailsPage = () => {
 		<div className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-[#050507] text-white">
 			{/* Backdrop fades into the scrolling content background. */}
 			<div
-				className="pointer-events-none absolute inset-x-0 top-0 h-[85svh] min-h-[560px] max-h-[960px] overflow-hidden"
+				className="pointer-events-none absolute inset-x-0 top-0 h-[85svh] min-h-[800px] max-h-[960px] overflow-hidden"
+				style={{
+					maskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+					WebkitMaskImage:
+						"linear-gradient(to bottom, black 40%, transparent 100%)",
+				}}
 				aria-hidden="true"
 			>
 				{movie.backdrop_path && (
@@ -71,7 +76,7 @@ export const MovieDetailsPage = () => {
 						className="h-full w-full object-cover"
 					/>
 				)}
-				<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,5,7,0.1)_0%,rgba(5,5,7,0.35)_25%,rgba(5,5,7,0.88)_70%,#050507_65%)]" />
+				<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,5,7,0.1)_0%,rgba(5,5,7,0.35)_25%,rgba(5,5,7,0.88)_70%,#050507_100%)]" />
 				<div className="absolute inset-0 bg-gradient-to-r from-[#050507]/90 via-[#050507]/20 to-[#050507]/10" />
 			</div>
 
