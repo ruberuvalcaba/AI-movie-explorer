@@ -22,7 +22,7 @@ export const HomePage = () => {
 			<div className="pointer-events-none fixed inset-2 top-36 z-10 overflow-hidden rounded-2xl sm:inset-5 sm:top-20 sm:rounded-[35px] border border-white/15 opacity-[0.15]">
 				<svg
 					aria-hidden="true"
-					className="absolute inset-0 h-full w-full rounded-[35px]"
+					className="absolute inset-0 h-full w-full  rounded-[35px]"
 				>
 					<filter id="noise">
 						<feTurbulence
@@ -36,7 +36,7 @@ export const HomePage = () => {
 					<rect width="100%" height="100%" filter="url(#noise)" />
 				</svg>
 				{/* Top TV bezel / glow */}
-				<div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#07070a] via-[#07070a]/95 to-transparent rounded-[35px]" />
+				<div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#07070a] via-[#07070a]/95 to-transparent rounded-2xl  sm:rounded-[35px]" />
 
 				{/* Ambient glow */}
 				<div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-purple-300/30 blur-[120px]" />
