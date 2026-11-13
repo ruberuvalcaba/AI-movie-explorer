@@ -38,7 +38,7 @@ export const IconButton = ({
 			<Icon
 				size={18}
 				strokeWidth={1.8}
-				className="transition-transform duration-200 group-hover:scale-110 text-yellow-400"
+				className="transition-transform duration-200 group-hover:scale-120 text-yellow-400"
 			/>
 
 			{Number(count) >= 0 && (

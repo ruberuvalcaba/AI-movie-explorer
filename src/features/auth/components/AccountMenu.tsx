@@ -57,9 +57,13 @@ export function AccountMenu() {
 						aria-label="Account options"
 						title="Account options"
 						disabled={pending}
-						className="flex cursor-pointer h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50"
+						className="flex group cursor-pointer h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50"
 					>
-						<EllipsisVertical size={18} aria-hidden="true" />
+						<EllipsisVertical
+							size={18}
+							aria-hidden="true"
+							className="transition-transform duration-200 group-hover:scale-120"
+						/>
 					</button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>

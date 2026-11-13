@@ -127,7 +127,7 @@ export const MovieAssistant = () => {
 						<MessageCircle
 							size={19}
 							strokeWidth={1.7}
-							className="transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-110"
+							className="transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-120"
 						/>
 					</span>
 

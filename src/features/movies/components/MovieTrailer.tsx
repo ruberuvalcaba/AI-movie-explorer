@@ -20,12 +20,12 @@ export const MovieTrailer = ({ movieTitle, videos }: MovieTrailerProps) => {
 				<button
 					type="button"
 					disabled={!trailer}
-					className="flex group cursor-pointer items-center gap-2 rounded-full bg-purple-300 px-6 py-3 text-sm font-semibold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+					className="flex group cursor-pointer items-center gap-2 rounded-2xl bg-purple-300 px-6 py-3 text-sm font-semibold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					<Play
 						size={17}
 						fill="currentColor"
-						className="transition-transform duration-200 group-hover:scale-110"
+						className="transition-transform duration-200 group-hover:scale-120"
 					/>
 					{"Trailer"}
 				</button>

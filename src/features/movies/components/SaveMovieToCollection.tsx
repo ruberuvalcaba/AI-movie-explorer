@@ -20,9 +20,9 @@ type Props = {
 };
 
 const actionClass =
-	"action-button flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50";
+	"action-button group hover:text-yellow-300 flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50";
 const compactClass =
-	"action-button flex cursor-pointer h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60";
+	"action-button flex cursor-pointer h-9 w-9 items-center justify-center rounded-2xl border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur-md transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60";
 
 export const SaveMovieToCollection = ({
 	movieId,
@@ -106,7 +106,7 @@ const MovieCollectionControl = ({
 		<div className={compact ? "relative" : "space-y-2"}>
 			<button
 				type="button"
-				className={`group hover:text-yellow-300 ${compact ? compactClass : actionClass}`}
+				className={`group/collection-action ${compact ? compactClass : actionClass}`}
 				disabled={movies.isPending || busy}
 				aria-label={
 					movies.isPending || busy || movies.isError
@@ -135,7 +135,7 @@ const MovieCollectionControl = ({
 							: saved
 								? "fill-yellow-400 text-yellow-300"
 								: undefined
-					} transition-transform duration-200 group-hover:scale-110 hover:fill-yellow-400`}
+					} transition-transform duration-200 group-hover/collection-action:scale-120 group-hover/collection-action:fill-yellow-400`}
 					aria-hidden="true"
 				/>
 				{!compact && label}
