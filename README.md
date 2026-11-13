@@ -461,3 +461,48 @@ Run `npm run test:providers` for grouping tests. The optional headless Chrome su
 (`MOVIE_TEST_BROWSER=1 npm run test:auth`) also covers availability categories,
 links, logo loading/failures, responsive layouts, and missing-data states using
 local fixtures rather than live streaming-provider availability.
+
+### External movie ratings (MDBList)
+
+Movie Details progressively adds IMDb, Rotten Tomatoes critics/audience, and
+Metacritic scores alongside TMDB's own score and votes. No averages are calculated.
+Cards, search results, collections, recommendations, and hover prefetches continue
+using TMDB alone. `MovieRatings` handles presentation; `MovieDetailsRatings`
+starts the independent query only after the details page has hydrated, so optional
+ratings never delay primary SSR or the existing details/watch-provider queries.
+
+Set `MDBLIST_API_KEY` in the server environment (already configured locally).
+Never prefix it with `VITE_`. The server-only `mdblist.server.ts` calls
+`https://api.mdblist.com/tmdb/movie/{movieId}/` directly. It returns normalized
+ratings only, catches upstream errors without logging credential-bearing URLs,
+and never forwards provider error bodies. Source names/values were checked against
+a live Interstellar (157336) response and [MDBList's API documentation](https://api.mdblist.com/docs/).
+
+Native `value` fields are range-checked; normalized `score` fields are ignored.
+Zero scores remain valid. Missing/invalid values become null; IMDb votes are
+optional and Rotten Tomatoes critics/audience can be independently available.
+The audience alias `tomatoesaudience` is supported, preferring valid `popcorn` data.
+The UI uses text source labels and links its external-rating attribution to MDBList.
+
+TanStack Query uses `['movie-external-ratings', movieId]` with 24-hour freshness
+and garbage collection, no automatic retries, and no focus/reconnect refetch.
+Missing ratings are successful empty data; temporary failures remain errors and
+are not cached as successful empty results. They may be requested on a later
+visit. Authentication/configuration errors are not automatically retried in the
+same client cache. HTTP 429 respects Retry-After (seconds or HTTP date), with a
+quota-reset-header/60-second fallback. A deadline in the existing query cache and
+current server process prevents requests during cooldown; it does not schedule
+automatic retries.
+
+No new server response-cache infrastructure is introduced. The browser query
+cache is in memory: a page refresh, new browser/device, or a separate server
+instance can incur additional quota usage. Daily request limits depend on the
+MDBList plan. No real secret values are included in source or documentation.
+
+Run `npm run test:ratings` for normalization and mocked server transport tests.
+`MOVIE_TEST_BROWSER=1 npm run test:auth` additionally checks progressive loading,
+source scales/votes, zero/missing/partial ratings, cache reuse, rate-limit/error
+fallbacks, responsive layout, and credential isolation. Browser/integration
+fixtures use a fake key and intercept upstream calls; they do not consume the
+real MDBList quota. Native server tests use the existing Node TypeScript support
+and a test-only alias resolver, without new application dependencies.

@@ -3,6 +3,7 @@ import { useParams } from "@tanstack/react-router";
 import { Clock, Star } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { MovieCast } from "@/features/movies/components/MovieCast";
+import { MovieDetailsRatings } from "@/features/movies/components/MovieDetailsRatings";
 import { MovieSpinner } from "@/features/movies/components/MovieSpinner";
 import { MovieTrailer } from "@/features/movies/components/MovieTrailer";
 import { MovieWatchProviders } from "@/features/movies/components/MovieWatchProviders";
@@ -102,22 +103,22 @@ export const MovieDetailsPage = () => {
 								<span className="h-1 w-1 rounded-full bg-white/30" />
 								<span>{movie.original_language?.toUpperCase()}</span>
 								<span className="h-1 w-1 rounded-full bg-white/30" />
-								<div className="flex items-center gap-1.5">
-									<Star size={14} className="fill-yellow-400 text-yellow-400" />
-									<span className="text-white">
-										{movie.vote_average.toFixed(1)}
-									</span>
+								<div className="flex items-center gap-1 text-sm">
+									<Clock size={15} />
+									<span>{formatRuntime(movie.runtime ?? 0)}</span>
 								</div>
-
-								<span className="h-1 w-1 rounded-full bg-white/30" />
-
-								<span>{movie.vote_count.toLocaleString()} votes</span>
 							</div>
 
 							{/* Title */}
 							<h1 className="break-words text-3xl font-bold tracking-tight sm:text-6xl">
 								{movie.title}
 							</h1>
+
+							<div className="mt-6 flex flex-wrap gap-3 sm:mt-3">
+								{movie.genres.map((genre) => (
+									<Badge key={genre.id} label={genre.name} />
+								))}
+							</div>
 
 							{/* Tagline */}
 							{movie.tagline && (
@@ -134,6 +135,13 @@ export const MovieDetailsPage = () => {
 									</span>
 								</p>
 							)}
+
+							<MovieDetailsRatings
+								key={movie.id}
+								movieId={movie.id}
+								score={movie.vote_average}
+								voteCount={movie.vote_count}
+							/>
 
 							{/* Overview */}
 							<p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
@@ -156,17 +164,6 @@ export const MovieDetailsPage = () => {
 									category="favorites"
 									movieId={movie.id}
 								/>
-							</div>
-
-							{/* Bottom info */}
-							<div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
-								<Badge
-									label={formatRuntime(movie.runtime ?? 0)}
-									icon={<Clock size={15} />}
-								/>
-								{movie.genres.map((genre) => (
-									<Badge key={genre.id} label={genre.name} />
-								))}
 							</div>
 						</div>
 					</div>

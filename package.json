@@ -11,6 +11,7 @@
     "lint": "biome lint",
     "check": "biome check",
     "test:auth": "node --test tests/unit/auth-redirect.test.mjs tests/unit/password-recovery.test.mjs && node tests/integration/auth.http.test.mjs",
+    "test:ratings": "node --import ./tests/fixtures/source-aliases.mjs --test tests/unit/external-ratings.test.mjs tests/unit/mdblist.server.test.mjs",
     "test:providers": "node --test tests/unit/watch-providers.test.mjs",
     "test:voice": "node --test tests/unit/transcription.server.test.mjs",
     "test:db": "node scripts/database.mjs",

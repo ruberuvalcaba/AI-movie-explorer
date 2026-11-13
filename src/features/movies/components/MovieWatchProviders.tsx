@@ -91,25 +91,13 @@ export function MovieWatchProviders({ watchProviders, region = "US" }: Props) {
 					href={availability.link}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg text-sm text-purple-300 underline underline-offset-4 hover:text-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+					className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg text-sm text-white/70 underline underline-offset-4 hover:text-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
 				>
 					View all watch options
 					<ExternalLink size={14} aria-hidden="true" />
 					<span className="sr-only"> (opens in a new tab)</span>
 				</a>
 			)}
-			<p className="mt-4 text-xs leading-5 text-white/50">
-				Streaming availability powered by{" "}
-				<a
-					href="https://www.justwatch.com/"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex min-h-11 items-center rounded underline underline-offset-2 hover:text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
-				>
-					JustWatch<span className="sr-only"> (opens in a new tab)</span>
-				</a>
-				.
-			</p>
 		</section>
 	);
 }

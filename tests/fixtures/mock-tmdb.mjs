@@ -5,5 +5,6 @@ globalThis.fetch = (input, options) => {
  if (url.hostname === 'api.themoviedb.org') {
   return originalFetch(new URL(url.pathname + url.search, process.env.TEST_TMDB_URL), options);
  }
+ if (url.hostname === 'api.mdblist.com') return originalFetch(new URL('/mdblist' + url.pathname + url.search, process.env.TEST_TMDB_URL), options);
  return originalFetch(input, options);
 };

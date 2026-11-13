@@ -106,7 +106,7 @@ const MovieCollectionControl = ({
 		<div className={compact ? "relative" : "space-y-2"}>
 			<button
 				type="button"
-				className={compact ? compactClass : actionClass}
+				className={`group hover:text-yellow-300 ${compact ? compactClass : actionClass}`}
 				disabled={movies.isPending || busy}
 				aria-label={
 					movies.isPending || busy || movies.isError
@@ -129,13 +129,13 @@ const MovieCollectionControl = ({
 			>
 				<Icon
 					size={compact ? 17 : 18}
-					className={
+					className={`${
 						movies.isPending || busy
 							? "animate-spin"
 							: saved
 								? "fill-yellow-400 text-yellow-300"
 								: undefined
-					}
+					} transition-transform duration-200 group-hover:scale-110 hover:fill-yellow-400`}
 					aria-hidden="true"
 				/>
 				{!compact && label}

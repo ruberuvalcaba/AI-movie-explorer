@@ -25,8 +25,10 @@ export async function testCollectionBrowser(base, cookie, expectedIds) {
   await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
   let id = 0;
   const pending = new Map();
+  const browserRequests = [];
   socket.addEventListener('message', ({ data }) => {
    const message = JSON.parse(data);
+   if (message.method === 'Network.requestWillBeSent') browserRequests.push(message.params.request.url);
    if (message.method === 'Fetch.requestPaused') {
     const broken = message.params.request.url.includes('broken-provider');
     void send('Fetch.fulfillRequest', {
@@ -97,7 +99,7 @@ export async function testCollectionBrowser(base, cookie, expectedIds) {
    assert.equal(await evaluate(`!!(${section}).querySelector('a[href="https://www.justwatch.com/"]')`), true, 'Attribution is visible even without availability');
    if (movieId === 910001) {
     assert.deepEqual(await evaluate(`[...(${section}).querySelectorAll('h3')].map(h => h.textContent)`), ['Stream', 'Free', 'Free with ads', 'Rent', 'Buy']);
-    assert.deepEqual(await evaluate(`[...(${section}).querySelector('ul[aria-label="Stream providers"]').children].map(li => li.lastElementChild.textContent)`), ['Prime Video', 'Netflix']);
+    assert.deepEqual(await evaluate(`[...(${section}).querySelector('ul[aria-label="Stream providers"]').children].map(li => li.querySelector('img')?.alt.replace(/ logo$/, '') ?? li.textContent)`), ['Prime Video', 'Netflix']);
     await evaluate(`(${section}).scrollIntoView({ block: 'start' })`);
     await waitFor(`(${section}).querySelector('img[alt="Prime Video logo"]')?.naturalWidth > 0`);
     await waitFor(`!(${section}).querySelector('ul[aria-label="Free with ads providers"] img')`);
@@ -119,6 +121,48 @@ export async function testCollectionBrowser(base, cookie, expectedIds) {
    }
   }
   console.log('PASS: Chrome Where to Watch sorting/categories, mobile/desktop layouts, links, attribution, valid/missing/broken logos, missing region/property/categories and failed availability.');
+
+  const ratings = `document.querySelector('section[aria-label="Movie ratings"]')`;
+  const readyMovie = id => `location.pathname === '/movie/${id}' && document.querySelector('h1')?.textContent === 'Movie ${id}' && !!(${ratings})`;
+  const waitRatings = async () => { await new Promise(resolve=>setTimeout(resolve,200)); await waitFor(`!(${ratings}).textContent.includes('Loading other ratings')`); };
+  const searchNavigate = async id => {
+   await evaluate(`(() => {const input=document.querySelector('#movie-search');input.focus();Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'${id}');input.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+   await waitFor(`!!document.querySelector('#movie-search-suggestions a[href="/movie/${id}"]')`);
+   await evaluate(`document.querySelector('#movie-search-suggestions a[href="/movie/${id}"]').click()`);
+   await waitFor(readyMovie(id));
+  };
+  await send('Page.navigate',{url:`${base}/movie/920001`});
+  await waitFor(readyMovie(920001));
+  assert.equal(await evaluate(`(${ratings}).textContent.includes('7.5/10')`),true,'TMDB renders before MDBList resolves');
+  assert.equal(await evaluate(`(${ratings}).textContent.includes('IMDb')`),false,'Slow external request never blocks primary details');
+  await waitFor(`(${ratings}).textContent.includes('8.2/10')`);
+  assert.deepEqual(await evaluate(`[...(${ratings}).querySelectorAll('dd')].map(d=>d.textContent)`),['7.5/10','10 votes','8.2/10','12,345 votes','91%','86%','77/100']);
+  assert.equal(await evaluate(`!!(${ratings}).querySelector('a[href="https://mdblist.com/"]')`),true,'MDBList attribution is shown');
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  assert.equal(await evaluate(`(${ratings}).scrollWidth <= (${ratings}).clientWidth`),true,'Ratings fit mobile width');
+  await send('Emulation.setDeviceMetricsOverride',{width:1400,height:900,deviceScaleFactor:1,mobile:false});
+  assert.equal(await evaluate(`(${ratings}).scrollWidth <= (${ratings}).clientWidth`),true,'Ratings fit desktop width');
+  await searchNavigate(920002); await waitRatings();
+  assert.equal(await evaluate(`(${ratings}).querySelectorAll('dl').length`),1,'Missing external ratings show only TMDB');
+  await evaluate(`document.querySelector('button[aria-label="Go back"]').click()`);
+  await waitFor(readyMovie(920001));
+  assert.equal(await evaluate(`(${ratings}).textContent.includes('8.2/10') && !(${ratings}).textContent.includes('Loading other ratings')`),true,'Back navigation reuses the ratings cache immediately');
+  await evaluate(`window.dispatchEvent(new Event('focus'))`);
+  for(const id of [920003,920004,920005,920006]) {
+   await searchNavigate(id); await waitRatings();
+   const text = await evaluate(`(${ratings}).textContent`);
+   assert.ok(text.includes('7.5/10'),'TMDB is always preserved');
+   if(id===920003) assert.ok(text.includes('0.0/10') && text.includes('0%') && text.includes('0/100'),'Zero scores remain visible');
+   if(id===920004) assert.ok(text.includes('81%') && text.includes('Audience') && !text.includes('Critics'),'Audience-only ratings are independent');
+   if(id===920005 || id===920006) assert.equal(await evaluate(`(${ratings}).querySelectorAll('dl').length`),1,'Upstream failures are optional and silent');
+  }
+  await searchNavigate(920002); await waitRatings();
+  await searchNavigate(920006); await waitRatings();
+  await searchNavigate(920007); await waitRatings();
+  await searchNavigate(920008); await waitRatings();
+  assert.equal(await evaluate(`(${ratings}).querySelectorAll('dl').length`),1,'Quota failures preserve TMDB');
+  assert.ok(browserRequests.every(url=>!url.includes('api.mdblist.com') && !url.includes('apikey=') && !url.includes('test-mdblist-secret')),'Browser requests never contain MDBList credentials or direct upstream URLs');
+  console.log('PASS: Chrome progressively loaded ratings, scales/votes, responsive layout, missing/zero/partial data, silent failures, back-navigation cache, and credential isolation.');
 
  } catch (error) {
   console.error('Collection browser failure:', error);

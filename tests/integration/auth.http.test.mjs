@@ -8,6 +8,7 @@ import { once } from 'node:events';
 import { PGlite } from '@electric-sql/pglite';
 import { defaultSerovalDeserializerPlugins } from '@tanstack/react-start';
 import { toJSON, fromCrossJSON } from 'seroval';
+import { externalRatingsFixture } from '../fixtures/external-ratings.mjs';
 import { watchProviderFixture } from '../fixtures/watch-providers.mjs';
 
 const user = { id: '11111111-1111-4111-8111-111111111111', email: 'test@example.com', aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: new Date().toISOString() };
@@ -32,6 +33,7 @@ let latestRecoveryRedirect = '';
 const summaryFetches = new Map();
 const detailFetches = new Map();
 let separateWatchProviderRequests = 0;
+const externalRatingRequests = new Map();
 let tmdbFailure = false;
 let profileWrites = 0;
 let latestRedirect = '';
@@ -64,7 +66,17 @@ const mock = createServer(async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('X-Supabase-Api-Version', '2024-01-01');
   const send = (status, value) => { res.writeHead(status); res.end(JSON.stringify(value)); };
-  if (/^\/3\/movie\/\d+$/.test(url.pathname)) {
+  if (/^\/mdblist\/tmdb\/movie\/\d+\/$/.test(url.pathname)) {
+   const id = Number(url.pathname.split('/').at(-2));
+   assert.equal(url.searchParams.get('apikey'), 'test-mdblist-secret');
+   externalRatingRequests.set(id, (externalRatingRequests.get(id) ?? 0) + 1);
+   if (id === 920001) await new Promise(resolve => setTimeout(resolve, 2000));
+   if ([920005,930007].includes(id)) { send(503, {error:'test-mdblist-secret'}); return; }
+   if ([920006,930006].includes(id)) { send(401, {error:'test-mdblist-secret'}); return; }
+   if ([920007,930008].includes(id)) { res.setHeader('Retry-After',id===920007?'60':'0'); send(429,{}); return; }
+   if (id===930003) {send(404,{});return;}
+   send(200,externalRatingsFixture(id));
+  } else if (/^\/3\/movie\/\d+$/.test(url.pathname)) {
    const id = Number(url.pathname.split('/').at(-1));
    const summary = !url.searchParams.has('append_to_response');
    if (summary) summaryFetches.set(id, (summaryFetches.get(id) ?? 0) + 1);
@@ -78,6 +90,9 @@ const mock = createServer(async (req, res) => {
     overview: 'Test movie', backdrop_path: null, vote_count: 10, genres: [], original_language: 'en', runtime: 100,
     videos: { results: [] },
     ...(!summary ? { 'watch/providers': watchProviderFixture(id) } : {}) });
+  } else if (url.pathname === '/3/search/movie') {
+   const id=Number(url.searchParams.get('query'));
+   send(200,{page:1,total_pages:1,total_results:1,results:[{id,title:`Movie ${id}`,poster_path:null,release_date:'2026-01-01',vote_average:7.5}]});
   } else if (/^\/3\/movie\/\d+\/credits$/.test(url.pathname)) {
    send(200, { cast: [], crew: [] });
   } else if (/^\/3\/movie\/\d+\/watch\/providers$/.test(url.pathname)) {
@@ -210,7 +225,7 @@ mock.listen(0, '127.0.0.1'); await once(mock, 'listening');
 const portProbe = createServer(); portProbe.listen(0, '127.0.0.1'); await once(portProbe, 'listening');
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const base = `http://127.0.0.1:${port}`;
-const child = spawn(process.execPath, ['--import', './tests/fixtures/mock-tmdb.mjs', '.output/server/index.mjs'], { env: { ...process.env, TEST_TMDB_URL: `http://127.0.0.1:${mock.address().port}`, TMDB_ACCESS_TOKEN: 'test-only-token', PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
+const child = spawn(process.execPath, ['--import', './tests/fixtures/mock-tmdb.mjs', '.output/server/index.mjs'], { env: { ...process.env, TEST_TMDB_URL: `http://127.0.0.1:${mock.address().port}`, TMDB_ACCESS_TOKEN: 'test-only-token', MDBLIST_API_KEY: 'test-mdblist-secret', PORT: String(port), HOST: '127.0.0.1', VITE_SUPABASE_URL: `http://127.0.0.1:${mock.address().port}`, VITE_SUPABASE_PUBLISHABLE_KEY: 'test-publishable-key', NODE_ENV: 'production' }, stdio: ['ignore', 'pipe', 'pipe'] });
 let output = ''; child.stdout.on('data', chunk => { output += chunk; }); child.stderr.on('data', chunk => { output += chunk; });
 try {
  for (let attempt = 0; ; attempt++) {
@@ -219,7 +234,7 @@ try {
  const assets = 'node_modules/.nitro/vite/services/ssr/assets';
  const ids = {};
  for (const file of await readdir(assets)) {
-  if (!/^(auth.functions|account.functions|profile.functions|collection.functions|recovery.functions|movie.functions)-/.test(file)) continue;
+  if (!/^(auth.functions|account.functions|profile.functions|collection.functions|recovery.functions|movie.functions|external-ratings.functions)-/.test(file)) continue;
   const source = await readFile(`${assets}/${file}`, 'utf8');
   for (const match of source.matchAll(/id: "([a-f0-9]+)",\s*name: "([^"]+)"/g)) ids[match[2]] = match[1];
  }
@@ -398,6 +413,11 @@ try {
  assert.equal(fullDetails['watch/providers'].results.US.flatrate[0].provider_name, 'Netflix', 'Availability is appended to movie details');
  assert.equal(detailFetches.get(900001), 1, 'Details and watch providers share one TMDB request');
  assert.equal(separateWatchProviderRequests, 0);
+ const ssrRatingsBefore = externalRatingRequests.get(940001) ?? 0;
+ const ssrDetails = await fetch(`${base}/movie/940001`);
+ assert.equal(ssrDetails.status,200);
+ await ssrDetails.text();
+ assert.equal(externalRatingRequests.get(940001) ?? 0,ssrRatingsBefore,'SSR never waits for or requests optional external ratings');
  // A user's watchlist is implicit: no setup record or sample import exists.
  const resultOf = async (name, options = {}) => {
   const response = await rpc(name, options);
@@ -414,6 +434,17 @@ try {
    assert.ok(decoded.error || decoded.result?.error, `${name} should reject invalid input`);
   }
  };
+ for (const [movieId, expected] of [[930001,'available'],[930002,'missing'],[930003,'missing'],[930004,'invalid-response'],[930005,'missing'],[930006,'unauthorized'],[930007,'upstream'],[930008,'rate-limited'],[930009,'invalid-response']]) {
+  const response = await resultOf('getMovieExternalRatings', { data: { movieId } });
+  assert.equal(response.status === 'unavailable' ? response.reason : response.status, expected);
+  assert.ok(!JSON.stringify(response).includes('test-mdblist-secret'), 'Server responses never expose upstream credentials or error details');
+ }
+ for (const movieId of [0,-1,1.5,2147483648,'157336']) await denied('getMovieExternalRatings', { data: { movieId } });
+ const publicAssets = (await readdir('.output/public/assets')).filter(file=>file.endsWith('.js'));
+ for (const file of publicAssets) {
+  const source = await readFile(`.output/public/assets/${file}`,'utf8');
+  assert.ok(!source.includes('MDBLIST_API_KEY') && !source.includes('test-mdblist-secret'), 'MDBList credentials and environment access stay out of client bundles');
+ }
  tmdbFailure = true;
  await denied('getMovieSummaryServerFn', summaryOptions(900099));
  tmdbFailure = false;
@@ -512,6 +543,12 @@ try {
   const { testCollectionBrowser } = await import('../browser/collection.browser.mjs');
   const expected = (await db.query("select tmdb_movie_id from public.saved_movies where user_id=$1 and category='watchlist' order by added_at desc,tmdb_movie_id asc limit 72", [user.id])).rows.map(row => row.tmdb_movie_id);
   await testCollectionBrowser(base, newDeviceCookie, expected);
+  assert.equal(externalRatingRequests.get(920001), 1, 'Client cache reuses ratings when navigating back or refocusing');
+  assert.equal(externalRatingRequests.get(920005), 1, 'Temporary errors are not aggressively retried');
+  assert.equal(externalRatingRequests.get(920006), 1, 'Unauthorized responses are not automatically retried');
+  assert.equal(externalRatingRequests.get(920007), 1, 'Rate limits are not automatically retried');
+  assert.equal(externalRatingRequests.get(920008), undefined, 'Cooldown applies across movie IDs');
+  assert.ok(!Array.from(externalRatingRequests.keys()).some(id=>id>=10000 && id<=11002), 'Collection cards never request external ratings');
   for (const id of [910001, 910002, 910003, 910004, 910005, 910006]) {
    assert.equal(detailFetches.get(id), 1, 'Each browser movie page uses one cached details request with providers');
   }
