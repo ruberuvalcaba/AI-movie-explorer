@@ -32,7 +32,7 @@ function ProviderLogo({ provider }: { provider: WatchProvider }) {
 			loading="lazy"
 			decoding="async"
 			onError={() => setFailed(true)}
-			className="h-11 w-11 rounded-lg object-contain grayscale"
+			className="h-11 w-11 rounded-xl object-contain grayscale border border-white/15"
 		/>
 	);
 }
