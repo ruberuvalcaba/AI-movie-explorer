@@ -113,6 +113,14 @@ export const MovieDetailsPage = () => {
 							<h1 className="break-words text-3xl font-bold tracking-tight sm:text-6xl">
 								{movie.title}
 							</h1>
+							{directors.length > 0 && (
+								<p className="mt-1 text-sm text-white/60">
+									Directed by{" "}
+									<span className="font-medium text-white">
+										{directors.map((director) => director.name).join(", ")}
+									</span>
+								</p>
+							)}
 
 							<div className="mt-6 flex flex-wrap gap-3 sm:mt-3">
 								{movie.genres.map((genre) => (
@@ -124,15 +132,6 @@ export const MovieDetailsPage = () => {
 							{movie.tagline && (
 								<p className="mt-3 text-lg italic text-white/50">
 									{movie.tagline}
-								</p>
-							)}
-
-							{directors.length > 0 && (
-								<p className="mt-4 text-sm text-white/60">
-									Directed by{" "}
-									<span className="font-medium text-white">
-										{directors.map((director) => director.name).join(", ")}
-									</span>
 								</p>
 							)}
 
