@@ -1,6 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { Clock, Star } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { MovieCast } from "@/features/movies/components/MovieCast";
 import { MovieDetailsRatings } from "@/features/movies/components/MovieDetailsRatings";
@@ -114,7 +114,7 @@ export const MovieDetailsPage = () => {
 								{movie.title}
 							</h1>
 							{directors.length > 0 && (
-								<p className="mt-1 text-sm text-white/60">
+								<p className="mt-6 text-sm text-white/60">
 									Directed by{" "}
 									<span className="font-medium text-white">
 										{directors.map((director) => director.name).join(", ")}
@@ -122,7 +122,7 @@ export const MovieDetailsPage = () => {
 								</p>
 							)}
 
-							<div className="mt-6 flex flex-wrap gap-3 sm:mt-3">
+							<div className="mt-3 flex flex-wrap gap-3 sm:mt-3">
 								{movie.genres.map((genre) => (
 									<Badge key={genre.id} label={genre.name} />
 								))}
