@@ -134,20 +134,8 @@ export const MovieDetailsPage = () => {
 								))}
 							</div>
 
-							<MovieDetailsRatings
-								key={movie.id}
-								movieId={movie.id}
-								score={movie.vote_average}
-								voteCount={movie.vote_count}
-							/>
-
-							{/* Overview */}
-							<p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-								{movie.overview}
-							</p>
-
 							{/* Actions */}
-							<div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
+							<div className="mt-5 flex flex-wrap gap-3 sm:mt-5">
 								<MovieTrailer
 									key={movie.id}
 									movieTitle={movie.title}
@@ -163,6 +151,18 @@ export const MovieDetailsPage = () => {
 									movieId={movie.id}
 								/>
 							</div>
+
+							<MovieDetailsRatings
+								key={movie.id}
+								movieId={movie.id}
+								score={movie.vote_average}
+								voteCount={movie.vote_count}
+							/>
+
+							{/* Overview */}
+							<p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+								{movie.overview}
+							</p>
 						</div>
 					</div>
 				</div>

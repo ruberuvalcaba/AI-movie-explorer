@@ -13,9 +13,11 @@ export interface MovieExternalRatings {
 	imdb: { score: number; voteCount: number | null } | null;
 	rottenTomatoes: {
 		criticsScore: number | null;
+		criticsVoteCount: number | null;
 		audienceScore: number | null;
+		audienceVoteCount: number | null;
 	} | null;
-	metacritic: { score: number } | null;
+	metacritic: { score: number; voteCount: number | null } | null;
 }
 
 export type ExternalRatingsFailure =

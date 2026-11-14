@@ -12,6 +12,13 @@ function validScore(value: unknown, maximum: number): value is number {
 	);
 }
 
+function voteCount(rating: MDBListRating | undefined): number | null {
+	const votes = rating?.votes;
+	return typeof votes === "number" && Number.isSafeInteger(votes) && votes >= 0
+		? votes
+		: null;
+}
+
 export function normalizeExternalRatings(
 	ratings: unknown,
 ): MovieExternalRatings {
@@ -33,22 +40,21 @@ export function normalizeExternalRatings(
 		imdb: imdb
 			? {
 					score: imdb.value as number,
-					voteCount:
-						typeof imdb.votes === "number" &&
-						Number.isSafeInteger(imdb.votes) &&
-						imdb.votes >= 0
-							? imdb.votes
-							: null,
+					voteCount: voteCount(imdb),
 				}
 			: null,
 		rottenTomatoes:
 			critics || audience
 				? {
 						criticsScore: critics ? (critics.value as number) : null,
+						criticsVoteCount: voteCount(critics),
 						audienceScore: audience ? (audience.value as number) : null,
+						audienceVoteCount: voteCount(audience),
 					}
 				: null,
-		metacritic: metacritic ? { score: metacritic.value as number } : null,
+		metacritic: metacritic
+			? { score: metacritic.value as number, voteCount: voteCount(metacritic) }
+			: null,
 	};
 }
 
