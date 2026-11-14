@@ -10,7 +10,7 @@ interface Props {
 
 function RatingSource({ name, logo }: { name?: string; logo: string }) {
 	return (
-		<span className=" min-h-10 w-full flex justify-center items-center gap-2 text-center">
+		<span className=" min-h-10 flex justify-center items-center gap-2 text-center">
 			<img
 				src={`/ratings/${logo}`}
 				alt=""
@@ -42,28 +42,26 @@ export function MovieRatings({
 			aria-label="Movie ratings"
 			className="mt-8 border-t border-b border-white/15 py-4"
 		>
-			<div className="flex flex-wrap gap-x-5 gap-y-8 sm:gap-x-8">
+			<div className="flex flex-wrap gap-x-6 gap-y-8 sm:gap-x-8">
 				<dl>
 					<dt className={labelClass}>
-						<RatingSource logo="tmdb.svg" />
+						<RatingSource name="TMDb" logo="tmdb.svg" />
 					</dt>
 					<dd className={valueClass}>{tmdbScore.toFixed(1)}/10</dd>
 					<dd className="mt-1 text-xs text-white/50">
-						<span className="sr-only">Votes: </span>
-						{formatVoteCount(tmdbVoteCount)}
+						{formatVoteCount(tmdbVoteCount)} votes
 					</dd>
 				</dl>
 
 				{imdb && (
 					<dl>
 						<dt className={labelClass}>
-							<RatingSource logo="imdb.png" />
+							<RatingSource name="IMDb" logo="imdb.png" />
 						</dt>
 						<dd className={valueClass}>{imdb.score.toFixed(1)}/10</dd>
 						{imdb.voteCount !== null && (
 							<dd className="mt-1 text-xs text-white/50">
-								<span className="sr-only">Votes: </span>
-								{formatVoteCount(imdb.voteCount)}
+								{formatVoteCount(imdb.voteCount)} votes
 							</dd>
 						)}
 					</dl>
@@ -72,42 +70,40 @@ export function MovieRatings({
 					<div>
 						<p className={labelClass}>
 							<RatingSource
-								// name="Rotten Tomatoes®"
-								name="Critics & Audience"
+								name="Rotten Tomatoes®"
 								logo="rotten-tomatoes.svg"
 							/>
 						</p>
 						<dl className="flex gap-4">
 							{rottenTomatoes.criticsScore !== null && (
 								<div>
-									<dt className="sr-only">Critics</dt>
 									<dd className={`${valueClass} flex items-center gap-1.5`}>
-										<span aria-hidden="true" className="text-sm">
+										{/* <span aria-hidden="true" className="text-sm">
 											🍅
-										</span>
-										{rottenTomatoes.criticsScore}%
+										</span> */}
+										{rottenTomatoes.criticsScore}%{" "}
+										<dt className="text-[10px] text-white/50">Critics</dt>
 									</dd>
 									{rottenTomatoes.criticsVoteCount != null && (
 										<dd className="mt-1 text-xs text-white/50">
-											<span className="sr-only">Votes: </span>
-											{`${formatVoteCount(rottenTomatoes.criticsVoteCount)}`}
+											{formatVoteCount(rottenTomatoes.criticsVoteCount)} reviews
 										</dd>
 									)}
 								</div>
 							)}
 							{rottenTomatoes.audienceScore !== null && (
 								<div>
-									<dt className="sr-only">Audience</dt>
 									<dd className={`${valueClass} flex items-center gap-1.5`}>
-										<span aria-hidden="true" className="text-sm">
+										{/* <span aria-hidden="true" className="text-sm">
 											🍿
-										</span>
+										</span> */}
 										{rottenTomatoes.audienceScore}%
+										<dt className="text-[10px] text-white/50">Audience</dt>
 									</dd>
 									{rottenTomatoes.audienceVoteCount != null && (
 										<dd className="mt-1 text-xs text-white/50">
-											<span className="sr-only">Votes: </span>
-											{`${formatVoteCount(rottenTomatoes.audienceVoteCount)}`}
+											{formatVoteCount(rottenTomatoes.audienceVoteCount)}{" "}
+											ratings
 										</dd>
 									)}
 								</div>
@@ -115,20 +111,19 @@ export function MovieRatings({
 						</dl>
 					</div>
 				)}
-				{metacritic && (
+				{/* {metacritic && (
 					<dl>
 						<dt className={labelClass}>
-							<RatingSource logo="metacritic.svg" />
+							<RatingSource name="Metacritic" logo="metacritic.svg" />
 						</dt>
 						<dd className={valueClass}>{metacritic.score}/100</dd>
 						{metacritic.voteCount != null && (
 							<dd className="mt-1 text-xs text-white/50">
-								<span className="sr-only">Votes: </span>
-								{formatVoteCount(metacritic.voteCount)}
+								{formatVoteCount(metacritic.voteCount)} reviews
 							</dd>
 						)}
 					</dl>
-				)}
+				)} */}
 			</div>
 			{loading && (
 				<output className="mt-3 block text-xs text-white/50">
