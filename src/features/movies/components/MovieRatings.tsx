@@ -40,7 +40,7 @@ export function MovieRatings({
 	return (
 		<section
 			aria-label="Movie ratings"
-			className="mt-8 border-t border-b border-white/15 py-4"
+			className="mt-8 border-y border-white/15 py-4"
 		>
 			<div className="flex flex-wrap gap-x-6 gap-y-8 sm:gap-x-8">
 				<dl>
