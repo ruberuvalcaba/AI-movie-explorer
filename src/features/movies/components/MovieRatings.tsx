@@ -36,7 +36,10 @@ export function MovieRatings({
 	const labelClass = "text-xs font-medium text-white/60";
 	const valueClass = "mt-1 text-sm font-semibold text-white";
 	return (
-		<section aria-label="Movie ratings" className="mt-5">
+		<section
+			aria-label="Movie ratings"
+			className="mt-10 border-t border-white/10 pt-6"
+		>
 			<div className="flex flex-wrap gap-x-6 gap-y-4">
 				<dl>
 					<dt className={labelClass}>

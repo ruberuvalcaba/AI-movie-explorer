@@ -122,18 +122,17 @@ export const MovieDetailsPage = () => {
 								</p>
 							)}
 
+							{/* Tagline */}
+							{movie.tagline && (
+								<p className="mt-1 text-lg italic text-white/50">
+									{movie.tagline}
+								</p>
+							)}
 							<div className="mt-3 flex flex-wrap gap-3 sm:mt-3">
 								{movie.genres.map((genre) => (
 									<Badge key={genre.id} label={genre.name} />
 								))}
 							</div>
-
-							{/* Tagline */}
-							{movie.tagline && (
-								<p className="mt-3 text-lg italic text-white/50">
-									{movie.tagline}
-								</p>
-							)}
 
 							<MovieDetailsRatings
 								key={movie.id}
