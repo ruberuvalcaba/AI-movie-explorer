@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { House, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { MovieSearchSuggestions } from "@/features/movies/components/MovieSearchSuggestions";
@@ -11,14 +11,19 @@ export const MovieSearchBar = () => {
 	const formRef = useRef<HTMLFormElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const search = useSearch({ strict: false });
+	const locationHref = useLocation({ select: (location) => location.href });
+	const previousLocationHref = useRef(locationHref);
 	const query = search.q ?? "";
 	const [input, setInput] = useState(query);
 	const [suggestionQuery, setSuggestionQuery] = useState("");
 	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
 	useEffect(() => {
-		setInput(query);
+		if (previousLocationHref.current === locationHref) return;
+		previousLocationHref.current = locationHref;
+		setInput("");
+		setSuggestionQuery("");
 		setSuggestionsOpen(false);
-	}, [query]);
+	}, [locationHref]);
 	useEffect(() => {
 		const timeout = window.setTimeout(() => {
 			setSuggestionQuery(input.trim());
@@ -48,8 +53,11 @@ export const MovieSearchBar = () => {
 			}}
 			onSubmit={(event) => {
 				event.preventDefault();
+				const submittedQuery = input.trim();
+				setInput("");
+				setSuggestionQuery("");
 				setSuggestionsOpen(false);
-				void navigate({ to: "/", search: { q: input.trim() || undefined } });
+				void navigate({ to: "/", search: { q: submittedQuery || undefined } });
 			}}
 		>
 			<label htmlFor="movie-search" className="sr-only">
@@ -120,6 +128,8 @@ export const MovieSearchBar = () => {
 					isLoading={waitingForSearch}
 					isError={isError && movies.length === 0}
 					onSelect={() => {
+						setInput("");
+						setSuggestionQuery("");
 						setSuggestionsOpen(false);
 						// Dismiss the mobile keyboard after a successful selection.
 						formRef.current?.querySelector("input")?.blur();

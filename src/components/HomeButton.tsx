@@ -5,6 +5,7 @@ export const HomeButton = () => {
 	return (
 		<Link
 			to="/"
+			search={{}}
 			aria-label="Go to home page"
 			className="action-button flex shrink-0 rounded-full backdrop-blur-xl transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70"
 		>

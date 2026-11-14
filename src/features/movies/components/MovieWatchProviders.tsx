@@ -44,7 +44,7 @@ export function MovieWatchProviders({ watchProviders, region = "US" }: Props) {
 	return (
 		<section
 			aria-label={`Where to Watch in ${country}`}
-			className="mt-10 min-w-0 border-t border-white/10 pt-6 sm:mt-12 sm:pt-8"
+			className="mt-8 min-w-0 border-t border-white/10 pt-6 sm:mt-8 sm:pt-8"
 		>
 			<div className="mb-5 flex flex-wrap items-center gap-3">
 				<h2 className="text-xl font-semibold tracking-tight text-purple-300 sm:text-2xl">
